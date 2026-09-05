@@ -45,12 +45,22 @@ const escape = (text) => String(text).replace(/[&<>"]/g, (c) => ({ "&": "&amp;",
 /**
  * The artifact as a JavaScript string literal, safe to sit inside a `<script>`.
  *
- * `JSON.stringify` handles the quoting; the two replacements after it handle the
- * one thing JSON does not know about — an HTML parser ends a script block at the
- * literal text `</script`, wherever it appears, and closes a comment at `-->`.
+ * `JSON.stringify` handles the quoting; the replacements after it handle what
+ * JSON does not know about — the HTML parser reads a script block's text
+ * before JavaScript does. `</` could end the block; `<!--` puts the parser in
+ * its "escaped" state and a `<script` after that in its "double escaped" state,
+ * in which the real `</script>` no longer closes the block — and the Worker
+ * contains all three, since it parses HTML and serves a page. Each is broken
+ * with a backslash that JavaScript ignores (`\/`, `\!` and `\s` are just `/`,
+ * `!` and `s` inside a string), so the browser sees no sequence and the
+ * program sees the same bytes.
  */
 function inlineLiteral(text) {
-  return JSON.stringify(text).replace(/<\//g, "<\\/").replace(/-->/g, "--\\>");
+  return JSON.stringify(text)
+    .replace(/<\//g, "<\\/")
+    .replace(/<!--/g, "<\\!--")
+    .replace(/-->/g, "--\\>")
+    .replace(/<script/gi, (m) => `<\\${m.slice(1)}`);
 }
 
 /** One table row per engine, for the page's "What it searches". */

@@ -107,6 +107,23 @@ test("docs/index.html carries the current source, the generator, the engine tabl
   for (const script of scripts) assert.ok(!/fetch\(|XMLHttpRequest|navigator\.sendBeacon/.test(script), "the page's own script never fetches");
 });
 
+test("the inlined source survives the HTML parser and comes back byte for byte", () => {
+  // The browser's HTML tokenizer reads a script block before JavaScript does:
+  // `</` can end it, `<!--` puts it in the escaped state and a later `<script`
+  // in the double-escaped state, where the real `</script>` no longer closes
+  // the block. The Worker contains all three (it parses HTML and serves a
+  // page), and the first published page shipped with an undefined SOURCE for
+  // exactly this reason.
+  const page = read("index.html");
+  const block = [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).find((s) => s.includes("var SOURCE ="));
+  assert.ok(block, "the SOURCE block is there");
+  for (const sequence of ["</", "<!--", "<script", "<SCRIPT", "-->"]) {
+    assert.ok(!block.includes(sequence), `${sequence} inside the script block`);
+  }
+  const value = new Function(`${block}; return SOURCE;`)();
+  assert.equal(value, SOURCE, "and JavaScript reads the same bytes back");
+});
+
 test("docs/feed.json is the seed, unexpired, and readable by the Worker", () => {
   assert.ok(feedIsCurrent(), "docs/feed.json lags the seed — run `npm run build`");
   const feed = __testing.readFeed(read("feed.json"), Date.now());
