@@ -33,6 +33,25 @@ broken one as a collapsed `drop_ratio` (rows seen, none emitted).
 | dmhy | rss | `https://share.dmhy.org/topics/rss/rss.xml?keyword=`: CDATA titles, `enclosure@url` is a base32 magnet, no swarm. Answers a broad query with up to 500 items (2.3 MB), so the engine reads the first 256 KB. Answered a browser; `max_bytes` set for it. |
 | archive | json | `https://archive.org/advancedsearch.php?q=&fl[]=identifier,title,item_size,publicdate&sort[]=downloads desc&rows=&output=json`. Comma-separated `fl[]` works. No infohash: `torrent_url` is `download/<id>/<id>_archive.torrent` and the resolver reads the hash from the file, for up to `UTSI_MAX_RESOLVE` rows a search. |
 
+## Measured from a deployed Worker (2026-09-05)
+
+The first real deployment (`npm run build` serial 1, pasted into a free
+Cloudflare account) ran one search and then `/api/v1/try` per engine:
+
+| engine | from Cloudflare | decision |
+|---|---|---|
+| knaben, torrentscsv, rutor, yts, eztvx, animetosho, sukebei, dmhy, archive | answered, 475–2571 ms | on |
+| piratebay | HTTP 429 on the first search, 10 rows in 906 ms on the retry | on — rate limiting comes and goes |
+| torrentdownload | timed out at 3 s on the first search, 5 rows in 367–552 ms on the retries | on — a slow first connection. The page has a "Fast Links" advert table with the same class as the results, so five matched rows per page carry nothing and are counted as seen |
+| bitsearch | bitsearch.eu HTTP 429 on every request; solidtorrents.to an HTML interstitial (`<meta name…`) | **off by default** |
+| torrentdownloads | no answer before the 5 s timeout, every time; answers a browser at once | **off by default** |
+| torrentkitty | HTTP 403 in 3 ms | **off by default** |
+| nyaa | HTTP 525, then HTTP 429 — what UTSI's probes saw too | **off by default**; animetosho aggregates it |
+
+The four are `enabled: false` in the seed and the feed: still engines, still
+selectable by name in `UTSI_ENGINES`, and one feed edit away from being on for
+everybody if a site changes its mind.
+
 ## Tried and left out (2026-09-05)
 
 **Behind a browser challenge** (an HTTP 200 carrying "Just a moment…"; a

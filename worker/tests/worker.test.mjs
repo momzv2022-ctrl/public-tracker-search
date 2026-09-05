@@ -1711,9 +1711,8 @@ const fromEnv = (pairs = {}) => readSettings({ UTSI_API_KEY: KEY, ...pairs });
 
 test("setting an upstream URL makes it the first engine", async () => {
   const WITHOUT_UPSTREAM = [
-    "knaben", "piratebay", "torrentscsv", "bitsearch", "torrentdownload", "torrentdownloads",
-    "rutor", "torrentkitty",
-    "yts", "eztvx", "animetosho", "nyaa", "sukebei", "dmhy", "archive",
+    "knaben", "piratebay", "torrentscsv", "torrentdownload", "rutor",
+    "yts", "eztvx", "animetosho", "sukebei", "dmhy", "archive",
   ];
   assert.deepEqual(fromEnv().engines, WITHOUT_UPSTREAM);
   assert.deepEqual(
@@ -1723,6 +1722,14 @@ test("setting an upstream URL makes it the first engine", async () => {
   // The general indexes lead: the first engine to report a release supplies
   // its name and details, and a DHT crawl's name is the file name.
   assert.equal(WITHOUT_UPSTREAM[0], "knaben");
+  // Four indexes ship `enabled: false`: measured from a deployed Worker on
+  // 2026-09-05, Cloudflare's addresses get 429, 403, an interstitial or no
+  // answer from them. They are still engines — naming one in UTSI_ENGINES
+  // turns it on for a deployment the site happens to answer.
+  for (const off of ["bitsearch", "torrentdownloads", "torrentkitty", "nyaa"]) {
+    assert.ok(!fromEnv().engines.includes(off), `${off} is off by default`);
+    assert.equal(SEED_DESCRIPTORS.find((d) => d.name === off).enabled, false);
+  }
   assert.deepEqual(fromEnv({ UTSI_ENGINES: "nyaa,knaben" }).engines, ["nyaa", "knaben"]);
 });
 

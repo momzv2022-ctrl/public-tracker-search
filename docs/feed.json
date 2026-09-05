@@ -1,9 +1,9 @@
 {
   "//": "The engine feed of public-tracker-search. Built from worker/src/worker.js by `npm run build`; a deployed Worker fetches it hourly. Data only.",
   "tgp_version": 1,
-  "serial": 1,
-  "issued_at": "2026-09-05T08:05:59Z",
-  "expires_at": "2026-11-04T08:05:59Z",
+  "serial": 2,
+  "issued_at": "2026-09-05T08:31:14Z",
+  "expires_at": "2026-11-04T08:31:14Z",
   "moved_to": null,
   "mirrors": [
     "https://momzv2022-ctrl.github.io/public-tracker-search/feed.json"
@@ -127,7 +127,8 @@
       "name": "bitsearch",
       "kind": "json",
       "breadth": "broad",
-      "enabled": true,
+      "enabled": false,
+      "note": "Refuses Cloudflare's addresses (HTTP 429 / interstitial, 2026-09-05); on only by UTSI_ENGINES.",
       "origins": [
         "https://bitsearch.eu",
         "https://solidtorrents.to"
@@ -202,7 +203,8 @@
       "name": "torrentdownloads",
       "kind": "rss",
       "breadth": "broad",
-      "enabled": true,
+      "enabled": false,
+      "note": "Never answers a Cloudflare Worker (2026-09-05, times out); on only by UTSI_ENGINES.",
       "origins": [
         "https://www.torrentdownloads.pro"
       ],
@@ -276,7 +278,8 @@
       "name": "torrentkitty",
       "kind": "html",
       "breadth": "broad",
-      "enabled": true,
+      "enabled": false,
+      "note": "HTTP 403 to Cloudflare's addresses (2026-09-05); on only by UTSI_ENGINES.",
       "origins": [
         "https://www.torrentkitty.tv"
       ],
@@ -338,7 +341,8 @@
       "name": "nyaa",
       "kind": "rss",
       "breadth": "narrow",
-      "enabled": true,
+      "enabled": false,
+      "note": "Rate-limits Cloudflare's addresses (HTTP 429/525, 2026-09-05); animetosho carries its releases. On only by UTSI_ENGINES.",
       "origins": [
         "https://nyaa.si"
       ],

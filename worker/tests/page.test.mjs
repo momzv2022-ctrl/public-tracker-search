@@ -91,11 +91,19 @@ test("docs/index.html carries the current source, the generator, the engine tabl
   assert.ok(!/__[A-Z_]+__/.test(page), "a placeholder survived the build");
   assert.ok(page.includes("function mintKey()"));
   assert.ok(page.includes("function generate("));
-  for (const engine of feedEngines()) {
-    if (!engine.site) continue;
+  // The table and the count are the engines that are on by default; the ones
+  // shipped `enabled: false` are the README's business, not a promise the page
+  // makes.
+  const on = feedEngines().filter((engine) => engine.enabled !== false);
+  const off = feedEngines().filter((engine) => engine.enabled === false);
+  assert.ok(off.length >= 1, "the seed carries the engines Cloudflare's addresses are refused by, off");
+  for (const engine of on) {
     assert.ok(page.includes(`href="${engine.site}"`), `${engine.name} is missing from the table`);
   }
-  assert.ok(page.includes(`>${feedEngines().length} public indexes</strong>`));
+  for (const engine of off) {
+    assert.ok(!page.includes(`href="${engine.site}"`), `${engine.name} is off and should not be promised`);
+  }
+  assert.ok(page.includes(`>${on.length} public indexes</strong>`));
   // The page may never reach the network. The CSP says so, and nothing in the
   // markup asks for anything: no external script, style, image or font.
   assert.match(page, /Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'/);

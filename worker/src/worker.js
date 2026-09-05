@@ -511,11 +511,17 @@ function originsFor(engineId, settings, descriptor = null) {
   const override = settings.engineUrls[engineId];
   if (override) return [{ url: override, from: "UTSI_ENGINE_URLS" }];
   const fed = feedDescriptorFor(engineId);
+  const seed = SEED_BY_NAME.get(engineId);
+  // A descriptor handed in directly — `/api/v1/try` — runs its own addresses,
+  // even when it borrows the name of an engine this file knows. The feed's and
+  // the seed's own descriptors arrive here too, and fall through to their lists.
+  if (descriptor && descriptor !== fed && descriptor !== seed && Array.isArray(descriptor.origins) && descriptor.origins.length) {
+    return descriptor.origins.map((url) => ({ url, from: "descriptor" }));
+  }
   if (fed && Array.isArray(fed.origins) && fed.origins.length) {
     return fed.origins.map((url) => ({ url, from: "feed" }));
   }
-  const seed = SEED_BY_NAME.get(engineId);
-  const seeded = ENGINE_ORIGINS[engineId] || (seed && seed.origins) || (descriptor && descriptor.origins) || [];
+  const seeded = ENGINE_ORIGINS[engineId] || (seed && seed.origins) || [];
   return seeded.map((url) => ({ url, from: "built-in" }));
 }
 
@@ -3117,11 +3123,16 @@ const SEED_DESCRIPTORS = [
     // Bitsearch — a DHT index with a JSON API; solidtorrents.to redirects here
     // and torrentz2.nz serves the same index. `createdAt` is only present on
     // rows indexed recently, and `updatedAt` is the last scrape, not a date
-    // worth reporting.
+    // worth reporting. Off by default: from a deployed Worker (2026-09-05)
+    // bitsearch.eu answered HTTP 429 to every request and solidtorrents.to
+    // with an interstitial page — Cloudflare's addresses are not welcome. The
+    // descriptor is right, so it stays, for UTSI_ENGINES and for the day the
+    // feed can switch it back on.
     name: "bitsearch",
     kind: "json",
     breadth: "broad",
-    enabled: true,
+    enabled: false,
+    note: "Refuses Cloudflare's addresses (HTTP 429 / interstitial, 2026-09-05); on only by UTSI_ENGINES.",
     origins: ["https://bitsearch.eu", "https://solidtorrents.to"],
     site: "https://bitsearch.eu",
     request: {
@@ -3165,11 +3176,14 @@ const SEED_DESCRIPTORS = [
   {
     // TorrentDownloads — a general index with an RSS search that carries the
     // infohash, size in bytes and the swarm on every item. The item's `link`
-    // is relative to the site.
+    // is relative to the site. Off by default: a deployed Worker's requests
+    // never get an answer (2026-09-05, connection open until the timeout),
+    // while the same URL answers a browser at once.
     name: "torrentdownloads",
     kind: "rss",
     breadth: "broad",
-    enabled: true,
+    enabled: false,
+    note: "Never answers a Cloudflare Worker (2026-09-05, times out); on only by UTSI_ENGINES.",
     origins: ["https://www.torrentdownloads.pro"],
     site: "https://www.torrentdownloads.pro",
     request: { method: "GET", path: "/rss.xml", query: { type: "search", search: "{q}" } },
@@ -3208,11 +3222,14 @@ const SEED_DESCRIPTORS = [
     },
   },
   {
-    // Torrent Kitty — a DHT index: a magnet and a date per row, no swarm.
+    // Torrent Kitty — a DHT index: a magnet and a date per row, no swarm. Off
+    // by default: HTTP 403 in three milliseconds to a deployed Worker
+    // (2026-09-05) — Cloudflare's address ranges are refused outright.
     name: "torrentkitty",
     kind: "html",
     breadth: "broad",
-    enabled: true,
+    enabled: false,
+    note: "HTTP 403 to Cloudflare's addresses (2026-09-05); on only by UTSI_ENGINES.",
     origins: ["https://www.torrentkitty.tv"],
     site: "https://www.torrentkitty.tv",
     request: { method: "GET", path: "/search/{q}/" },
@@ -3249,10 +3266,15 @@ const SEED_DESCRIPTORS = [
     // Nyaa — East Asian media, over its RSS. One address on purpose: the
     // mirrors that once sat here belong to other people, and Nyaa's own
     // position is that unofficial mirrors have served miners and ransomware.
+    // Off by default, as UTSI found before: it rate-limits Cloudflare's
+    // addresses (HTTP 429 and 525 on 2026-09-05). Its releases still arrive
+    // through animetosho, which aggregates it, and sukebei — the same software
+    // on the same network — answers.
     name: "nyaa",
     kind: "rss",
     breadth: "narrow",
-    enabled: true,
+    enabled: false,
+    note: "Rate-limits Cloudflare's addresses (HTTP 429/525, 2026-09-05); animetosho carries its releases. On only by UTSI_ENGINES.",
     origins: ["https://nyaa.si"],
     site: "https://nyaa.si",
     request: { method: "GET", path: "/", query: { page: "rss", q: "{q}" } },
@@ -3533,11 +3555,17 @@ function feedDescriptorFor(name) {
  * operator's implicit priorities. An explicit UTSI_ENGINES outranks all of it.
  */
 function defaultRoster() {
-  if (!FEED.engines) return DEFAULT_ENGINES;
-  const roster = DEFAULT_ENGINES.filter((engineId) => {
-    const fed = FEED.engines.get(engineId);
-    return !fed || fed.enabled !== false;
-  });
+  // An engine marked `enabled: false` — by the feed, or failing that by the
+  // seed it shipped with — is not asked by default. It stays selectable by
+  // name in UTSI_ENGINES, for a deployment the site happens to answer.
+  const alive = (engineId) => {
+    const fed = FEED.engines ? FEED.engines.get(engineId) : null;
+    if (fed) return fed.enabled !== false;
+    const seed = SEED_BY_NAME.get(engineId);
+    return !seed || seed.enabled !== false;
+  };
+  const roster = DEFAULT_ENGINES.filter(alive);
+  if (!FEED.engines) return roster;
   for (const descriptor of FEED.engines.values()) {
     if (descriptor.enabled === false) continue;
     if (!roster.includes(descriptor.name) && !(descriptor.name in ENGINES)) {

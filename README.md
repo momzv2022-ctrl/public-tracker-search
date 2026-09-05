@@ -1,6 +1,6 @@
 # Public Tracker Search
 
-Search the public torrent indexes — fifteen of them, at once — from a URL only
+Search the public torrent indexes — eleven of them, at once — from a URL only
 you know.
 
 One file, run for free by Cloudflare, asks the indexes your question and merges
@@ -73,15 +73,11 @@ in one list.
 | [Knaben](https://knaben.org) | everything — a meta-index over dozens of trackers, 1337x, RuTracker and The Pirate Bay among them, each row naming its tracker | JSON API |
 | [The Pirate Bay](https://apibay.org) | everything | JSON API |
 | [Torrents-CSV](https://torrents-csv.com) | everything — a DHT crawl | JSON API |
-| [Bitsearch](https://bitsearch.eu) | everything — a DHT index (also behind solidtorrents.to and torrentz2.nz) | JSON API |
 | [TorrentDownload](https://www.torrentdownload.info) | everything | search page |
-| [TorrentDownloads](https://www.torrentdownloads.pro) | everything | RSS |
 | [Rutor](https://rutor.info) | everything, Russian-language | search page |
-| [Torrent Kitty](https://www.torrentkitty.tv) | everything — a DHT index | search page |
 | [YTS](https://yts.gg) | films | JSON API |
 | [EZTV](https://eztvx.to) | television | JSON API |
-| [Anime Tosho](https://animetosho.org) | anime | JSON API |
-| [Nyaa](https://nyaa.si) | anime and East Asian media | RSS |
+| [Anime Tosho](https://animetosho.org) | anime — and it aggregates Nyaa | JSON API |
 | [Sukebei](https://sukebei.nyaa.si) | Nyaa's adult half | RSS |
 | [DMHY](https://share.dmhy.org) | anime, Chinese-language | RSS |
 | [Internet Archive](https://archive.org) | public domain film, Creative Commons media, software, datasets | JSON API + `.torrent` |
@@ -91,6 +87,16 @@ a release supplies its name and details — unless `UTSI_ENGINES` says
 otherwise. Whether a site also answers *your* Worker is a separate question:
 public indexes rate limit, move domain and sometimes decline Cloudflare's
 addresses, and `/api/v1/engines?probe=1` is how you ask.
+
+Four more ship in the file but **off by default**, because a deployed Worker
+measured them refusing Cloudflare's addresses on 2026-09-05:
+[Bitsearch](https://bitsearch.eu) (HTTP 429, and an interstitial page from
+solidtorrents.to), [TorrentDownloads](https://www.torrentdownloads.pro) (never
+answers), [Torrent Kitty](https://www.torrentkitty.tv) (HTTP 403) and
+[Nyaa](https://nyaa.si) (HTTP 429; its releases arrive through Anime Tosho).
+Their descriptors are correct, so naming one in `UTSI_ENGINES` turns it on for
+a deployment the site happens to answer, and the feed can switch any of them
+back on for everybody the day that changes.
 
 Sites behind a browser challenge cannot be read from a Worker at all, which is
 why 1337x, RuTracker, Kickass, MagnetDL, ExtraTorrent and the like are not in

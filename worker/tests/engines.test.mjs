@@ -30,6 +30,7 @@ const {
   humanSize,
   infohashFromText,
   intOrNone,
+  originsFor,
   readSettings,
   search,
   selectorProblem,
@@ -392,10 +393,13 @@ const ALL = () => stub({
   "https://archive.org/advancedsearch.php": fixture("archive.json"),
 });
 
+/** Every seed engine by name, the ones off by default included. */
+const EVERY_ENGINE = SEED_DESCRIPTORS.map((d) => d.name);
+
 test("every shipped engine runs in one search, off one query, with no credential sent anywhere", async () => {
   LIVENESS.engines.clear();
   const http = ALL();
-  const config = settings({ queryMatch: "off" });
+  const config = settings({ queryMatch: "off", engines: EVERY_ENGINE });
   const reply = await search(query("ubuntu"), http, config);
   assert.equal(reply.status, 200);
   assert.deepEqual(reply.body.engines.slice().sort(), config.engines.slice().sort(), JSON.stringify(reply.body.engine_errors || {}));
@@ -419,7 +423,7 @@ test("every shipped engine runs in one search, off one query, with no credential
 });
 
 test("healthz after that search says every engine answered, and how many rows each kept", async () => {
-  const config = settings({ queryMatch: "off" });
+  const config = settings({ queryMatch: "off", engines: EVERY_ENGINE });
   await search(query("ubuntu"), ALL(), config);
   const health = await handle("GET", "https://w.dev/healthz", new Headers(), stub({}), config);
   assert.equal(health.body.status, "ok");
@@ -458,6 +462,14 @@ test("/api/v1/try runs one descriptor live and shows its rows or its complaint",
   const dead = await tryDescriptor(params, stub({}), config);
   assert.match(dead.error, /HTTP 404/);
   assert.match((await tryDescriptor(new URLSearchParams({ d: "nope" }), http, config)).error, /JSON/);
+
+  // A try that borrows a shipped engine's name still runs its own addresses —
+  // that is how a new address for a known engine is tested before the feed
+  // carries it — while the engine itself keeps the list it shipped with.
+  const renamed = { ...seed("torrentkitty"), origins: ["https://kitty.test"] };
+  const borrowed = await tryDescriptor(new URLSearchParams({ d: JSON.stringify(renamed), q: "ubuntu" }), http, config);
+  assert.equal(borrowed.rows.length, 2, JSON.stringify(borrowed));
+  assert.deepEqual(originsFor("torrentkitty", config).map((o) => o.url), seed("torrentkitty").origins);
 
   // Through the router: the key is required, like every route that fetches.
   const refused = await handle("GET", `https://w.dev/api/v1/try?${params}`, new Headers(), http, config);
