@@ -56,7 +56,7 @@ const API_KEY = "";
 
 // Bumped when the behaviour changes. `/healthz` reports it, and compares it
 // with the version the project publishes, so a Worker can tell you it is old.
-const VERSION = "0.1.0";
+const VERSION = "0.1.1";
 
 // Where `/healthz` looks for "is there a newer version". Reached from
 // `/healthz` only, never from a search, and never fatal: if it does not answer
@@ -419,6 +419,11 @@ function readSettings(env) {
      * it off, and drops those rows.
      */
     maxResolve: envInt(env, "UTSI_MAX_RESOLVE", 4, 0, 16),
+    // How long one `.torrent` fetch may take. Two seconds, because this runs
+    // after the fan-out has finished and adds straight to the client's wait;
+    // a measured Archive fetch took 2.5–3 s, and a row that misses this is
+    // simply dropped from an answer that was already there.
+    resolveTimeoutS: envInt(env, "UTSI_RESOLVE_TIMEOUT_S", 2, 1, 30),
 
     // Wall clock, not CPU. Waiting on `fetch()` is free under the CPU limit, so
     // these exist to bound how long a client waits, nothing else.
@@ -4531,10 +4536,10 @@ async function resolveLinks(rows, http, settings) {
       let status;
       let data;
       try {
-        const result = await raceTimeout(
-          http.bytes(row.torrentUrl, { timeout: settings.engineTimeoutS }),
-          settings.engineTimeoutS * 1000,
-        );
+        // Its own, shorter clock: this runs after the fan-out, so every second
+        // here is a second added to the whole answer.
+        const budget = Math.min(settings.engineTimeoutS, settings.resolveTimeoutS);
+        const result = await raceTimeout(http.bytes(row.torrentUrl, { timeout: budget }), budget * 1000);
         // A row that will not resolve is dropped later for having no magnet.
         // There is nothing else worth saying about it.
         if (result === TIMED_OUT) return;
@@ -4652,8 +4657,11 @@ async function search(query, http, settings) {
   // here can collapse a row against one that already had theirs. In sorted
   // order rather than inside the client's window, because a row without a hash
   // usually has no swarm count either and sorts to the end — where a window
-  // would never reach it, and the Archive's film would never appear.
-  if (settings.maxResolve) {
+  // would never reach it, and the Archive's film would never appear. Only when
+  // the page is not already full of rows that have their hash: a `.torrent`
+  // is a second round trip to a slow host, and a search that found plenty
+  // should not wait on it. Scarce results are exactly when the Archive helps.
+  if (settings.maxResolve && ordered.filter((row) => row.infohash).length < query.offset + query.limit) {
     await resolveLinks(ordered, http, settings);
     ordered = sortRows(merge(ordered), query.sort);
   }

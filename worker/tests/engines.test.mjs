@@ -366,6 +366,24 @@ test("archive rows arrive without a hash and are resolved from the .torrent, wit
   assert.match(reply.body.torrents[0].magnet, /^magnet:\?xt=urn:btih:[0-9a-f]{40}/);
   assert.equal(reply.body.torrents[0].torrent_url, "https://archive.org/download/dvd_20250906/dvd_20250906_archive.torrent");
 
+  // A page already full of rows with their hash does not wait on a `.torrent`:
+  // three Archive rows behind eight hashed rows, limit 5, no fetch.
+  const busy = stub({
+    "https://archive.org/advancedsearch.php": fixture("archive.json"),
+    "https://api.knaben.org/v1": fixture("knaben.json"),
+    "https://apibay.org/q.php": fixture("piratebay.json"),
+    "https://torrents-csv.com/service/search": fixture("torrentscsv.json"),
+    "https://archive.org/download/": torrent,
+  });
+  const fullPage = await search(
+    { ...query("big buck bunny"), limit: 5 },
+    busy,
+    settings({ engines: ["knaben", "piratebay", "torrentscsv", "archive"], queryMatch: "off" }),
+  );
+  assert.ok(fullPage.body.count >= 5);
+  assert.equal(busy.calls.filter((call) => call.url.includes("/download/")).length, 0, "no .torrent fetched for a full page");
+  assert.equal(settings().resolveTimeoutS, 2);
+
   // With the resolver off the rows are dropped rather than sent without a magnet.
   const off = await search(query("big buck bunny"), stub({ "https://archive.org/advancedsearch.php": fixture("archive.json") }), settings({ engines: ["archive"], maxResolve: 0 }));
   assert.equal(off.body.torrents.length, 0);
