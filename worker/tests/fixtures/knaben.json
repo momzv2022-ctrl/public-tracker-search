@@ -1,0 +1,43 @@
+{
+  "total": {"value": 3, "relation": "eq"},
+  "hits": [
+    {
+      "id": "5555555",
+      "title": "Big Buck Bunny 2008 1080p BluRay x264-GRP",
+      "hash": "DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C",
+      "peers": 12,
+      "seeders": 340,
+      "bytes": 1073741824,
+      "date": "2019-01-01T00:00:00+00:00",
+      "tracker": "1337x",
+      "trackerId": "5555555",
+      "category": ["Movies"],
+      "categoryId": [3000000],
+      "magnetUrl": "magnet:?xt=urn:btih:DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C&dn=Big+Buck+Bunny",
+      "details": "https://knaben.org/torrent/5555555",
+      "cachedOrigin": null
+    },
+    {
+      "id": "5555556",
+      "title": "Sintel 2010 4K Remaster &amp; Extras",
+      "hash": null,
+      "peers": 2,
+      "seeders": 55,
+      "bytes": "2147483648",
+      "date": "2024-05-01T12:00:00+00:00",
+      "tracker": "TorrentGalaxy",
+      "category": ["Movies"],
+      "categoryId": [3000000],
+      "magnetUrl": "magnet:?xt=urn:btih:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&dn=Sintel",
+      "details": "https://knaben.org/torrent/5555556"
+    },
+    {
+      "id": "5555557",
+      "title": "",
+      "hash": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "seeders": 1,
+      "peers": 0,
+      "tracker": "EZTV"
+    }
+  ]
+}

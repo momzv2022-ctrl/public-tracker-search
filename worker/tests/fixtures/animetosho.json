@@ -1,0 +1,31 @@
+[
+  {
+    "id": 1234567,
+    "title": "[SubsPlease] Public Domain Animation - 01 (1080p) [ABCD1234].mkv",
+    "link": "https://animetosho.org/view/subsplease-public-domain-animation-01.1234567",
+    "timestamp": 1714564800,
+    "total_size": 1503238553,
+    "seeders": 412,
+    "leechers": 37,
+    "magnet_uri": "magnet:?xt=urn:btih:aa11bb22cc33dd44ee55ff6677889900aabbccdd&dn=Public+Domain+Animation"
+  },
+  {
+    "id": 1234568,
+    "title": "Public Domain Animation - Complete Series [720p][x265]",
+    "link": "https://animetosho.org/view/public-domain-animation-complete.1234568",
+    "timestamp": 1714478400,
+    "total_size": 8589934592,
+    "seeders": 88,
+    "leechers": 9,
+    "magnet_uri": "magnet:?xt=urn:btih:1122334455667788990011223344556677889900&dn=Complete+Series"
+  },
+  {
+    "id": 1234569,
+    "title": "no magnet on this row",
+    "link": "https://animetosho.org/view/broken.1234569",
+    "total_size": 1,
+    "seeders": 1,
+    "leechers": 0,
+    "magnet_uri": ""
+  }
+]

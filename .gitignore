@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+*.log
+# Nothing is generated except docs/, which is committed on purpose.

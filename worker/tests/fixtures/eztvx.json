@@ -1,0 +1,31 @@
+{
+  "torrents_count": 2,
+  "limit": 100,
+  "page": 1,
+  "torrents": [
+    {
+      "id": 2001,
+      "hash": "DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C",
+      "filename": "Public.Domain.Show.S01E01.1080p.WEB-DL.x264.mkv",
+      "episode_url": "https://eztvx.to/ep/2001/public-domain-show-s01e01/",
+      "torrent_url": "https://zoink.ch/torrent/Public.Domain.Show.S01E01.torrent",
+      "magnet_url": "magnet:?xt=urn:btih:dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c&dn=Public.Domain.Show.S01E01",
+      "title": "Public Domain Show S01E01 1080p WEB-DL x264",
+      "size_bytes": "1610612736",
+      "date_released_unix": 1714564800,
+      "seeds": 245,
+      "peers": 18
+    },
+    {
+      "id": 2002,
+      "hash": "",
+      "title": "Public Domain Show S01E02 720p HDTV x265",
+      "episode_url": "https://eztvx.to/ep/2002/public-domain-show-s01e02/",
+      "magnet_url": "magnet:?xt=urn:btih:99887766554433221100ffeeddccbbaa99887766&dn=S01E02",
+      "size_bytes": "0",
+      "date_released_unix": 1714478400,
+      "seeds": 61,
+      "peers": 4
+    }
+  ]
+}

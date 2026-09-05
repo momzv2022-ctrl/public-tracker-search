@@ -1,0 +1,29 @@
+{
+  "torrents_count": 2,
+  "limit": 100,
+  "page": 1,
+  "torrents": [
+    {
+      "id": 4001,
+      "hash": "2222222222222222222222222222222222222222",
+      "title": "Michael Jackson - Thriller (1982) [24bit FLAC]",
+      "episode_url": "https://eztvx.to/ep/4001/thriller/",
+      "magnet_url": "magnet:?xt=urn:btih:2222222222222222222222222222222222222222&dn=Thriller",
+      "size_bytes": "1073741824",
+      "date_released_unix": 1700000000,
+      "seeds": 512,
+      "peers": 30
+    },
+    {
+      "id": 4002,
+      "hash": "3333333333333333333333333333333333333333",
+      "title": "Miraculous Tales of Ladybug and Cat Noir S06E18 Heartfixer 1080p DSNP WEB-DL",
+      "episode_url": "https://eztvx.to/ep/4002/miraculous-s06e18/",
+      "magnet_url": "magnet:?xt=urn:btih:3333333333333333333333333333333333333333&dn=Miraculous",
+      "size_bytes": "1031839424",
+      "date_released_unix": 1756238400,
+      "seeds": 670,
+      "peers": 99
+    }
+  ]
+}

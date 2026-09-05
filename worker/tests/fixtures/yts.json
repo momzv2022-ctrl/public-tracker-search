@@ -1,0 +1,42 @@
+{
+  "status": "ok",
+  "status_message": "Query was successful",
+  "data": {
+    "movie_count": 1,
+    "limit": 20,
+    "page_number": 1,
+    "movies": [
+      {
+        "id": 45,
+        "url": "https://yts.mx/movies/sintel-2010",
+        "title": "Sintel",
+        "title_long": "Sintel (2010)",
+        "year": 2010,
+        "torrents": [
+          {
+            "url": "https://yts.mx/torrent/download/3333333333333333333333333333333333333333",
+            "hash": "3333333333333333333333333333333333333333",
+            "quality": "1080p",
+            "type": "bluray",
+            "video_codec": "x264",
+            "size_bytes": 734003200,
+            "seeds": 120,
+            "peers": 8,
+            "date_uploaded_unix": 1546300500
+          },
+          {
+            "url": "https://yts.mx/torrent/download/4444444444444444444444444444444444444444",
+            "hash": "4444444444444444444444444444444444444444",
+            "quality": "720p",
+            "type": "web",
+            "video_codec": "x264",
+            "size_bytes": 419430400,
+            "seeds": 45,
+            "peers": 3,
+            "date_uploaded_unix": 1546300400
+          }
+        ]
+      }
+    ]
+  }
+}

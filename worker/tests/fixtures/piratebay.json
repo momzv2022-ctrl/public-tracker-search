@@ -1,0 +1,58 @@
+[
+  {
+    "id": "12345678",
+    "name": "Big Buck Bunny 2008 1080p BluRay x264-GRP",
+    "info_hash": "DD8255ECDC7CA55FB0BBF81323D87062DB1F6D1C",
+    "leechers": "12",
+    "seeders": "340",
+    "num_files": "3",
+    "size": "1073741824",
+    "username": "someuploader",
+    "added": "1546300800",
+    "status": "vip",
+    "category": "201",
+    "imdb": "tt1254207"
+  },
+  {
+    "id": "12345679",
+    "name": "Sintel 2010 4K Remaster &amp; Extras",
+    "info_hash": "9999999999999999999999999999999999999999",
+    "leechers": "5",
+    "seeders": "77",
+    "num_files": "12",
+    "size": "2147483648",
+    "username": "another",
+    "added": "1714564800",
+    "status": "trusted",
+    "category": "601",
+    "imdb": ""
+  },
+  {
+    "id": "12345680",
+    "name": "Some Album 2019 FLAC",
+    "info_hash": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "leechers": "0",
+    "seeders": "9",
+    "num_files": "0",
+    "size": "0",
+    "username": "third",
+    "added": "0",
+    "status": "member",
+    "category": "104",
+    "imdb": ""
+  },
+  {
+    "id": "0",
+    "name": "",
+    "info_hash": "ffffffffffffffffffffffffffffffffffffffff",
+    "leechers": "0",
+    "seeders": "0",
+    "num_files": "0",
+    "size": "0",
+    "username": "",
+    "added": "0",
+    "status": "member",
+    "category": "0",
+    "imdb": ""
+  }
+]

@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Nothing on this page may talk to the network: no scripts from elsewhere,
+     no images, no fonts, no fetch. The browser enforces this line. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Search the public torrent indexes from one URL</title>
+<meta name="description" content="Copy one file, paste it into a free Cloudflare Worker, and get a URL and a key that search __ENGINE_COUNT__ public torrent indexes at once — for qBittorrent, for an app, for anything that speaks HTTP.">
+<meta name="color-scheme" content="light">
+<style>
+:root {
+  --bg: #ffffff; --ink: #111111; --muted: #666666; --line: #e5e5e5; --soft: #fafafa;
+  --code: #f6f6f6; --accent: #ba5a08; --ok: #17603a; --bad: #a3211a; --radius: 10px;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; padding: 2rem 1.15rem 6rem; background: var(--bg); color: var(--ink);
+  font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow-wrap: break-word; -webkit-font-smoothing: antialiased;
+}
+main { max-width: 40rem; margin: 0 auto; }
+h1 { font-size: clamp(1.65rem, 6vw, 2.1rem); line-height: 1.2; letter-spacing: -.022em; margin: 0 0 .55rem; font-weight: 700; }
+h2 { font-size: 1.28rem; line-height: 1.3; letter-spacing: -.015em; margin: 2.6rem 0 .5rem; font-weight: 650; }
+h2 .n { display: inline-block; min-width: 1.6em; color: var(--muted); font-weight: 600; }
+p { margin: .7rem 0; }
+.lede { color: var(--muted); font-size: 1.06rem; margin: 0 0 1.1rem; }
+.note { color: var(--muted); font-size: .935rem; }
+.note code, p code, li code { color: var(--ink); }
+a { color: var(--ink); text-underline-offset: 2px; text-decoration-thickness: 1px; }
+code, textarea, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+code { font-size: .9em; background: var(--code); padding: .1em .32em; border-radius: 4px; }
+ol { padding-left: 1.3rem; } li { margin: .4rem 0; }
+
+.out { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; margin: 1rem 0; background: var(--soft); }
+.keyrow { display: flex; align-items: center; gap: .6rem; flex-wrap: wrap; margin: 0 0 .9rem; }
+.keyrow .mono { font-size: 1.02rem; background: var(--code); border: 1px solid var(--line); border-radius: 8px; padding: .5rem .7rem; user-select: all; -webkit-user-select: all; }
+.keyrow button { width: auto; min-height: 2.4rem; padding: .4rem .8rem; font-size: .92rem; }
+#code { width: 100%; height: 11rem; font-size: 12px; line-height: 1.4; white-space: pre; overflow: auto; background: var(--bg);
+  border: 1px solid #c9c9c9; border-radius: 8px; padding: .6rem .7rem; color: var(--ink); resize: vertical; }
+.buttons { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin-top: .8rem; }
+button {
+  display: flex; align-items: center; justify-content: center; width: 100%; min-height: 3.15rem;
+  padding: .8rem 1rem; font: inherit; font-weight: 600; letter-spacing: -.005em; text-align: center;
+  border: 1px solid var(--accent); border-radius: 8px; background: var(--accent); color: #fff;
+  cursor: pointer; font-size: 1.02rem;
+}
+button.ghost { background: var(--bg); color: var(--ink); border-color: #c9c9c9; }
+button[disabled] { opacity: .45; cursor: not-allowed; }
+button:not([disabled]):active { transform: translateY(1px); }
+.status { min-height: 1.35rem; margin-top: .5rem; font-size: .9rem; font-weight: 600; text-align: center; }
+.status.ok { color: var(--ok); } .status.bad { color: var(--bad); }
+@media (max-width: 420px) { .buttons { grid-template-columns: 1fr; } }
+
+table.engines { width: 100%; border-collapse: collapse; font-size: .93rem; margin: .6rem 0; }
+table.engines th, table.engines td { text-align: left; padding: .38rem .5rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+table.engines th { font-size: .8rem; text-transform: uppercase; letter-spacing: .02em; color: var(--muted); font-weight: 650; }
+table.engines td.k { color: var(--muted); white-space: nowrap; }
+
+footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .89rem; }
+footer .mono { word-break: break-all; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Search the public torrent indexes from one URL</h1>
+<p class="lede">
+  Copy one file, paste it into a free Cloudflare Worker, and you get a URL and
+  a key that search <strong>__ENGINE_COUNT__ public indexes</strong> at once —
+  names, sizes, seeders and <code>magnet:</code> links, in one list, for
+  qBittorrent or any app that speaks HTTP.
+</p>
+<p class="note">
+  This page makes no network request at all, and the browser is told to refuse
+  one. Your key is made here, in your browser, and written into your copy of
+  the file — nowhere else. There is no public copy of this: the only URL that
+  exists is the one you make.
+</p>
+
+<h2><span class="n">1.</span> Copy the code</h2>
+<div class="out">
+  <div class="keyrow">
+    <span>Your key</span>
+    <span class="mono" id="key"></span>
+    <button class="ghost" type="button" id="new-key">New key</button>
+  </div>
+  <textarea id="code" readonly spellcheck="false" aria-label="worker.js"></textarea>
+  <div class="buttons">
+    <button type="button" id="copy">Copy the code</button>
+    <button type="button" class="ghost" id="download">Download worker.js</button>
+  </div>
+  <div class="status" id="status" role="status" aria-live="polite"></div>
+</div>
+<p class="note">
+  The key is already inside the file, on the <code>API_KEY</code> line near the
+  top. You do not need to write it down: the Worker shows it to you once it is
+  running.
+</p>
+
+<h2><span class="n">2.</span> Put it on Cloudflare</h2>
+<ol>
+  <li>Sign in at <a href="https://dash.cloudflare.com/" rel="noopener">dash.cloudflare.com</a> (free, no card; an email address and a password). Open <strong>Workers &amp; Pages</strong>, press <strong>Create</strong>, choose <strong>Start with Hello World</strong>, and press <strong>Deploy</strong>.</li>
+  <li>Press <strong>Edit code</strong>. Select everything in the editor, delete it, paste the code from above, and press <strong>Deploy</strong>.</li>
+</ol>
+
+<h2><span class="n">3.</span> Open it</h2>
+<p>
+  Open the Worker's address — the <strong>Visit</strong> link, or the
+  <code>workers.dev</code> URL on its page. It shows <strong>your URL and your
+  key</strong>, ready to copy into your app, and a button that runs a real
+  search so you can see it work.
+</p>
+<p class="note">
+  Anyone who can open that address can read the key, so keep the address to
+  yourself; the page tells you how to hide the key once your app has it. To
+  change the key, copy the code again with a new one and paste it over the old.
+</p>
+
+<h2>Use it</h2>
+<p>
+  <strong>qBittorrent:</strong> the <a href="utsi.py" download>search plugin</a>
+  takes your URL and key on its first two lines. <em>View → Search Engine</em>,
+  then in the Search tab <em>Search plugins → Install a new one → Local
+  file</em>.
+</p>
+<p>
+  <strong>Anything else:</strong> <code>GET your-url/api/v1/search?q=…</code>
+  with the key in an <code>X-API-Key</code> header. Every row has a name, a
+  size, seeders, leechers and a <code>magnet</code>. The full API, and how to
+  point an app that already talks to a Unified Torrent Search Interface at
+  this, is in the <a href="https://github.com/momzv2022-ctrl/public-tracker-search#use-it" rel="noopener">README</a>.
+</p>
+
+<h2>What it searches</h2>
+<p class="note">
+  Every index below, at once, from your Worker. <em>Broad</em> ones answer
+  anything; <em>narrow</em> ones cover one subject. The list is kept current
+  after you paste: the Worker checks this site's <a href="feed.json">feed</a>
+  hourly for moved addresses, changed pages and new indexes, and takes those
+  without you doing anything.
+</p>
+<table class="engines">
+  <thead><tr><th>Index</th><th>Covers</th><th>Read as</th></tr></thead>
+  <tbody>
+__ENGINE_ROWS__
+  </tbody>
+</table>
+<p class="note">
+  Whether every one of them answers <em>your</em> Worker is an empirical
+  question — a site can decline Cloudflare's addresses — and your Worker's
+  <code>/healthz</code> is where the answer is. Turn any of them off with
+  <code>UTSI_ENGINES</code> in the Worker's settings.
+</p>
+
+<footer>
+  <p><strong>What this is.</strong> One readable file with no dependencies, run for free by Cloudflare. It asks the indexes your question and merges the answers, in the same API as the <a href="https://github.com/momzv2022-ctrl/unified-torrent-search-interface" rel="noopener">Unified Torrent Search Interface</a>. Source and documentation: <a href="https://github.com/momzv2022-ctrl/public-tracker-search" rel="noopener">momzv2022-ctrl/public-tracker-search</a>.</p>
+  <p><strong>Check it before you trust it.</strong> The file before your key goes in is <a href="worker.js" download>worker.js</a> on this site, version <span id="version">__VERSION__</span>, SHA-256 <span class="mono" id="sha">__SHA256__</span>. Search it for <code>fetch(</code>: the only things it ever contacts are the indexes in the table above and this site's feed.</p>
+  <p>It hosts nothing, stores nothing and downloads nothing; the links open in whatever torrent app you already have. MIT licence, no warranty, no liability. Laws about what you may download differ from country to country, and so do the terms of the sites this asks; complying with both is yours to do.</p>
+</footer>
+
+</main>
+
+<script>
+/* The generator, inlined so this page has no second file to load. */
+__GENERATOR_LIB__
+</script>
+<script>
+/* The file, as one string. */
+var SOURCE = __WORKER_SOURCE__;
+</script>
+<script>
+(function () {
+  function byId(id) { return document.getElementById(id); }
+
+  var key = "";
+  var code = "";
+  var codeBox = byId("code");
+  var status = byId("status");
+
+  function refresh() {
+    key = mintKey();
+    byId("key").textContent = key;
+    try {
+      code = generate(SOURCE, { key: key }).code;
+      codeBox.value = code;
+    } catch (error) {
+      code = "";
+      codeBox.value = "";
+      say(String(error && error.message || error), "bad");
+      byId("copy").disabled = true;
+      byId("download").disabled = true;
+    }
+  }
+
+  byId("new-key").addEventListener("click", function () {
+    refresh();
+    say("New key. The code above carries it.", "ok");
+  });
+
+  function say(text, cls) {
+    status.className = "status " + (cls || "");
+    status.textContent = text;
+    if (cls === "ok") setTimeout(function () { if (status.textContent === text) status.textContent = ""; }, 5000);
+  }
+
+  /* Copy: the clipboard API first, then the old selection trick. Safari
+     allows both only inside a tap, which this is. If even that fails, the
+     box above is selectable by hand. */
+  function legacyCopy(text) {
+    var area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "-1000px";
+    document.body.appendChild(area);
+    area.select();
+    var ok = false;
+    try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+    document.body.removeChild(area);
+    return ok;
+  }
+
+  byId("copy").addEventListener("click", function () {
+    if (!code) return;
+    var done = function () { say("Copied. Now paste it into your Worker and press Deploy.", "ok"); };
+    var failed = function () {
+      if (legacyCopy(code)) return done();
+      say("Could not copy. Select the code in the box above and copy it by hand.", "bad");
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(done, failed);
+    } else failed();
+  });
+
+  byId("download").addEventListener("click", function () {
+    if (!code) return;
+    var blob = new Blob([code], { type: "application/javascript" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "worker.js";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    say("Downloaded. Paste its contents into your Worker and press Deploy.", "ok");
+  });
+
+  refresh();
+})();
+</script>
+</body>
+</html>

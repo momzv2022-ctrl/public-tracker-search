@@ -1,0 +1,40 @@
+{
+  "torrents_count": 3,
+  "limit": 100,
+  "page": 1,
+  "torrents": [
+    {
+      "id": 3001,
+      "hash": "2a4b81f8a5a76f9dd9706181dc7444e0d7d65d17",
+      "title": "Miraculous Tales of Ladybug and Cat Noir S06E18 Heartfixer 1080p DSNP WEB-DL DDP5 1 H 264-LAZY",
+      "episode_url": "https://eztvx.to/ep/3001/miraculous-tales-s06e18/",
+      "magnet_url": "magnet:?xt=urn:btih:2a4b81f8a5a76f9dd9706181dc7444e0d7d65d17&dn=Miraculous",
+      "size_bytes": "1031839424",
+      "date_released_unix": 1756238400,
+      "seeds": 670,
+      "peers": 99
+    },
+    {
+      "id": 3002,
+      "hash": "5566778899aabbccddeeff00112233445566778f",
+      "title": "Public Domain Show S01E09 720p HDTV x265-GRP",
+      "episode_url": "https://eztvx.to/ep/3002/public-domain-show-s01e09/",
+      "magnet_url": "magnet:?xt=urn:btih:5566778899aabbccddeeff00112233445566778f&dn=PDS.S01E09",
+      "size_bytes": "734003200",
+      "date_released_unix": 1756152000,
+      "seeds": 412,
+      "peers": 20
+    },
+    {
+      "id": 3003,
+      "hash": "aabbccddeeff00112233445566778899aabbccdd",
+      "title": "Spider-Man Chronicles S02E01 1080p WEB-DL x264-LAZY",
+      "episode_url": "https://eztvx.to/ep/3003/spider-man-chronicles-s02e01/",
+      "magnet_url": "magnet:?xt=urn:btih:aabbccddeeff00112233445566778899aabbccdd&dn=SMC.S02E01",
+      "size_bytes": "2147483648",
+      "date_released_unix": 1756065600,
+      "seeds": 190,
+      "peers": 11
+    }
+  ]
+}

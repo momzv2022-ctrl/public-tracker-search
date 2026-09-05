@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa">
+  <channel>
+    <title>Nyaa - Home - Torrent File RSS</title>
+    <description>RSS Feed for Home</description>
+    <link>https://nyaa.si/</link>
+    <atom:link href="https://nyaa.si/?page=rss" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>[SubGroup] Some Show - 01 (1080p) [ABCD1234].mkv</title>
+      <link>https://nyaa.si/download/1837000.torrent</link>
+      <guid isPermaLink="true">https://nyaa.si/view/1837000</guid>
+      <pubDate>Wed, 01 May 2024 12:00:00 -0000</pubDate>
+      <nyaa:seeders>210</nyaa:seeders>
+      <nyaa:leechers>9</nyaa:leechers>
+      <nyaa:downloads>4032</nyaa:downloads>
+      <nyaa:infoHash>cccccccccccccccccccccccccccccccccccccccc</nyaa:infoHash>
+      <nyaa:categoryId>1_2</nyaa:categoryId>
+      <nyaa:category>Anime - English-translated</nyaa:category>
+      <nyaa:size>1.4 GiB</nyaa:size>
+      <nyaa:comments>0</nyaa:comments>
+      <nyaa:trusted>Yes</nyaa:trusted>
+      <nyaa:remake>No</nyaa:remake>
+    </item>
+    <item>
+      <title>Some Show OST FLAC</title>
+      <link>https://nyaa.si/download/1837001.torrent</link>
+      <guid isPermaLink="true">https://nyaa.si/view/1837001</guid>
+      <pubDate>Thu, 02 May 2024 08:30:00 -0000</pubDate>
+      <nyaa:seeders>34</nyaa:seeders>
+      <nyaa:leechers>1</nyaa:leechers>
+      <nyaa:downloads>512</nyaa:downloads>
+      <nyaa:infoHash>DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD</nyaa:infoHash>
+      <nyaa:categoryId>2_1</nyaa:categoryId>
+      <nyaa:category>Audio - Lossless</nyaa:category>
+      <nyaa:size>420.7 MiB</nyaa:size>
+      <nyaa:comments>0</nyaa:comments>
+      <nyaa:trusted>No</nyaa:trusted>
+      <nyaa:remake>No</nyaa:remake>
+    </item>
+    <item>
+      <title>Broken row with no infohash</title>
+      <link>https://nyaa.si/download/1837002.torrent</link>
+      <guid isPermaLink="true">https://nyaa.si/view/1837002</guid>
+      <pubDate>Thu, 02 May 2024 09:00:00 -0000</pubDate>
+      <nyaa:seeders>1</nyaa:seeders>
+      <nyaa:leechers>0</nyaa:leechers>
+      <nyaa:categoryId>1_1</nyaa:categoryId>
+      <nyaa:size>12 KiB</nyaa:size>
+    </item>
+  </channel>
+</rss>

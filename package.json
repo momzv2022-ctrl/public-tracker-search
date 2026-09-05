@@ -1,0 +1,13 @@
+{
+  "name": "public-tracker-search",
+  "private": true,
+  "type": "module",
+  "description": "Present so that Node reads the .js files as ES modules. No dependencies, no install step, no lockfile.",
+  "license": "MIT",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "test": "node --test worker/tests/*.test.mjs",
+    "build": "node worker/tools/build.mjs",
+    "feed": "node worker/tools/feed.mjs build"
+  }
+}

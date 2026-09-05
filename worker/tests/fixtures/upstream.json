@@ -1,0 +1,55 @@
+{
+  "query": "big buck bunny",
+  "count": 3,
+  "limit": 50,
+  "offset": 0,
+  "took_ms": 2412,
+  "torrents": [
+    {
+      "magnet": "magnet:?xt=urn:btih:dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c&dn=Big+Buck+Bunny",
+      "infohash": "dd8255ecdc7ca55fb0bbf81323d87062db1f6d1c",
+      "name": "Big.Buck.Bunny.2008.1080p.BluRay.x264-UPSTREAM",
+      "size_bytes": 1073741824,
+      "files": 4,
+      "category": "video",
+      "seeders": 512,
+      "leechers": 30,
+      "year": "2008",
+      "resolution": "1080p",
+      "codec": "x264",
+      "source": "bluray",
+      "first_seen": "2018-12-31T00:00:00Z",
+      "scraped_at": "2026-08-12T12:00:00Z",
+      "description_url": "https://1337x.to/torrent/1/",
+      "sources": ["1337x", "piratebay"]
+    },
+    {
+      "magnet": "magnet:?xt=urn:btih:7777777777777777777777777777777777777777&dn=Bunny+S01E02",
+      "infohash": "7777777777777777777777777777777777777777",
+      "name": "Bunny.Chronicles.S01E02.720p.WEB-DL.x265-GRP",
+      "size_bytes": 734003200,
+      "category": "video",
+      "seeders": 88,
+      "leechers": 6,
+      "year": "",
+      "resolution": "720p",
+      "codec": "x265",
+      "source": "web-dl",
+      "season": "01",
+      "episode": "02",
+      "first_seen": "2021-05-01T00:00:00Z",
+      "scraped_at": "2026-08-12T12:00:00Z",
+      "sources": ["nyaa"]
+    },
+    {
+      "magnet": "magnet:?xt=urn:btih:8888888888888888888888888888888888888888",
+      "name": "bunny toolkit installer",
+      "seeders": 4,
+      "leechers": 0,
+      "scraped_at": "2026-08-12T12:00:00Z",
+      "sources": ["torrentscsv"]
+    }
+  ],
+  "engines": ["1337x", "nyaa", "piratebay", "torrentscsv"],
+  "partial": null
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:torznab="http://torznab.com/schemas/2015/feed">
+  <channel>
+    <title>Jackett</title>
+    <item>
+      <title>Big Buck Bunny 2008 2160p UHD BluRay x265-GRP</title>
+      <guid>https://indexer.test/details/1</guid>
+      <comments>https://indexer.test/details/1</comments>
+      <pubDate>Tue, 01 Jan 2019 00:00:00 +0000</pubDate>
+      <size>8589934592</size>
+      <link>magnet:?xt=urn:btih:5555555555555555555555555555555555555555&amp;dn=Big+Buck+Bunny</link>
+      <torznab:attr name="seeders" value="55" />
+      <torznab:attr name="peers" value="60" />
+      <torznab:attr name="files" value="2" />
+    </item>
+    <item>
+      <title>Big Buck Bunny 2008 1080p WEB-DL x264</title>
+      <guid>https://indexer.test/details/2</guid>
+      <pubDate>Wed, 02 Jan 2019 00:00:00 +0000</pubDate>
+      <size>2147483648</size>
+      <link>https://indexer.test/download/2.torrent</link>
+      <torznab:attr name="infohash" value="6666666666666666666666666666666666666666" />
+      <torznab:attr name="seeders" value="10" />
+      <torznab:attr name="leechers" value="2" />
+    </item>
+    <item>
+      <title>Big Buck Bunny 2008 480p needs a round trip</title>
+      <guid>https://indexer.test/details/3</guid>
+      <pubDate>Thu, 03 Jan 2019 00:00:00 +0000</pubDate>
+      <size>209715200</size>
+      <link>https://indexer.test/download/3.torrent</link>
+      <torznab:attr name="seeders" value="7" />
+      <torznab:attr name="peers" value="9" />
+    </item>
+  </channel>
+</rss>

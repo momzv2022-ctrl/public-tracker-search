@@ -1,0 +1,547 @@
+{
+  "//": "The engine feed of public-tracker-search. Built from worker/src/worker.js by `npm run build`; a deployed Worker fetches it hourly. Data only.",
+  "tgp_version": 1,
+  "serial": 1,
+  "issued_at": "2026-09-05T08:05:59Z",
+  "expires_at": "2026-11-04T08:05:59Z",
+  "moved_to": null,
+  "mirrors": [
+    "https://momzv2022-ctrl.github.io/public-tracker-search/feed.json"
+  ],
+  "engines": [
+    {
+      "name": "knaben",
+      "kind": "json",
+      "breadth": "broad",
+      "enabled": true,
+      "origins": [
+        "https://api.knaben.org",
+        "https://api.knaben.eu"
+      ],
+      "site": "https://knaben.org",
+      "request": {
+        "method": "POST",
+        "path": "/v1",
+        "body": {
+          "search_type": "100%",
+          "search_field": "title",
+          "query": "{q}",
+          "order_by": "seeders",
+          "order_direction": "desc",
+          "from": 0,
+          "size": "{limit}",
+          "hide_unsafe": true
+        }
+      },
+      "rows": "hits",
+      "rows_required": true,
+      "provenance": "tracker",
+      "fields": {
+        "name": "title",
+        "infohash": [
+          "hash",
+          "magnetUrl"
+        ],
+        "size_bytes": "bytes",
+        "seeders": "seeders",
+        "leechers": "peers",
+        "first_seen": "date",
+        "description_url": "details"
+      }
+    },
+    {
+      "name": "piratebay",
+      "kind": "json",
+      "breadth": "broad",
+      "enabled": true,
+      "origins": [
+        "https://apibay.org"
+      ],
+      "site": "https://apibay.org",
+      "request": {
+        "method": "GET",
+        "path": "/q.php",
+        "query": {
+          "q": "{q}"
+        }
+      },
+      "rows": "",
+      "fields": {
+        "name": "name",
+        "infohash": "info_hash",
+        "size_bytes": {
+          "from": "size",
+          "nonzero": true
+        },
+        "files": {
+          "from": "num_files",
+          "nonzero": true
+        },
+        "seeders": "seeders",
+        "leechers": "leechers",
+        "category": {
+          "from": "category",
+          "prefix": 1,
+          "map": {
+            "1": "audio",
+            "2": "video",
+            "3": "software",
+            "4": "software"
+          }
+        },
+        "first_seen": "added",
+        "description_url": {
+          "template": "https://thepiratebay.org/description.php?id={value}",
+          "from": "id"
+        }
+      }
+    },
+    {
+      "name": "torrentscsv",
+      "kind": "json",
+      "breadth": "broad",
+      "enabled": true,
+      "origins": [
+        "https://torrents-csv.com"
+      ],
+      "site": "https://torrents-csv.com",
+      "request": {
+        "method": "GET",
+        "path": "/service/search",
+        "query": {
+          "q": "{q}",
+          "size": "{limit}"
+        }
+      },
+      "rows": "torrents",
+      "fields": {
+        "name": "name",
+        "infohash": "infohash",
+        "size_bytes": "size_bytes",
+        "seeders": "seeders",
+        "leechers": "leechers",
+        "first_seen": "created_unix"
+      }
+    },
+    {
+      "name": "bitsearch",
+      "kind": "json",
+      "breadth": "broad",
+      "enabled": true,
+      "origins": [
+        "https://bitsearch.eu",
+        "https://solidtorrents.to"
+      ],
+      "site": "https://bitsearch.eu",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/search",
+        "query": {
+          "q": "{q}",
+          "category": "all",
+          "sort": "seeders"
+        }
+      },
+      "rows": "results",
+      "rows_required": true,
+      "fields": {
+        "name": "title",
+        "infohash": "infohash",
+        "size_bytes": "size",
+        "seeders": "seeders",
+        "leechers": "leechers",
+        "first_seen": "createdAt",
+        "description_url": {
+          "template": "https://bitsearch.eu/torrent/{value}",
+          "from": "id"
+        }
+      }
+    },
+    {
+      "name": "torrentdownload",
+      "kind": "html",
+      "breadth": "broad",
+      "enabled": true,
+      "origins": [
+        "https://www.torrentdownload.info"
+      ],
+      "site": "https://www.torrentdownload.info",
+      "request": {
+        "method": "GET",
+        "path": "/search",
+        "query": {
+          "q": "{q}"
+        }
+      },
+      "rows": "table.table2 tr",
+      "fields": {
+        "name": {
+          "selector": "td.tdleft a"
+        },
+        "infohash": {
+          "selector": "td.tdleft a",
+          "attr": "href"
+        },
+        "size_bytes": {
+          "cell": 3
+        },
+        "seeders": {
+          "selector": "td.tdseed"
+        },
+        "leechers": {
+          "selector": "td.tdleech"
+        },
+        "description_url": {
+          "selector": "td.tdleft a",
+          "attr": "href",
+          "absolute": true
+        }
+      }
+    },
+    {
+      "name": "torrentdownloads",
+      "kind": "rss",
+      "breadth": "broad",
+      "enabled": true,
+      "origins": [
+        "https://www.torrentdownloads.pro"
+      ],
+      "site": "https://www.torrentdownloads.pro",
+      "request": {
+        "method": "GET",
+        "path": "/rss.xml",
+        "query": {
+          "type": "search",
+          "search": "{q}"
+        }
+      },
+      "fields": {
+        "name": "title",
+        "infohash": "info_hash",
+        "size_bytes": "size",
+        "seeders": "seeders",
+        "leechers": "leechers",
+        "first_seen": "pubDate",
+        "description_url": {
+          "from": "link",
+          "absolute": true
+        }
+      }
+    },
+    {
+      "name": "rutor",
+      "kind": "html",
+      "breadth": "broad",
+      "enabled": true,
+      "origins": [
+        "https://rutor.info",
+        "https://rutor.is"
+      ],
+      "site": "https://rutor.info",
+      "request": {
+        "method": "GET",
+        "path": "/search/0/0/100/0/{q}"
+      },
+      "rows": "div#index tr.gai, div#index tr.tum",
+      "fields": {
+        "name": {
+          "selector": "a[href^='/torrent/']"
+        },
+        "infohash": {
+          "selector": "a[href^='magnet:']",
+          "attr": "href"
+        },
+        "size_bytes": {
+          "cell": -2
+        },
+        "seeders": {
+          "selector": "span.green"
+        },
+        "leechers": {
+          "selector": "span.red"
+        },
+        "torrent_url": {
+          "selector": "a.downgif",
+          "attr": "href",
+          "absolute": true
+        },
+        "description_url": {
+          "selector": "a[href^='/torrent/']",
+          "attr": "href",
+          "absolute": true
+        }
+      }
+    },
+    {
+      "name": "torrentkitty",
+      "kind": "html",
+      "breadth": "broad",
+      "enabled": true,
+      "origins": [
+        "https://www.torrentkitty.tv"
+      ],
+      "site": "https://www.torrentkitty.tv",
+      "request": {
+        "method": "GET",
+        "path": "/search/{q}/"
+      },
+      "rows": "table#archiveResult tr",
+      "fields": {
+        "name": {
+          "selector": "td.name"
+        },
+        "infohash": {
+          "selector": "td.action a[href^='magnet:']",
+          "attr": "href"
+        },
+        "size_bytes": {
+          "selector": "td.size"
+        },
+        "first_seen": {
+          "selector": "td.date"
+        },
+        "description_url": {
+          "selector": "td.action a[href^='/information/']",
+          "attr": "href",
+          "absolute": true
+        }
+      }
+    },
+    {
+      "name": "animetosho",
+      "kind": "json",
+      "breadth": "narrow",
+      "enabled": true,
+      "origins": [
+        "https://feed.animetosho.org"
+      ],
+      "site": "https://animetosho.org",
+      "request": {
+        "method": "GET",
+        "path": "/json",
+        "query": {
+          "q": "{q}"
+        }
+      },
+      "rows": "",
+      "fields": {
+        "name": "title",
+        "infohash": "magnet_uri",
+        "size_bytes": "total_size",
+        "seeders": "seeders",
+        "leechers": "leechers",
+        "first_seen": "timestamp",
+        "description_url": "link"
+      }
+    },
+    {
+      "name": "nyaa",
+      "kind": "rss",
+      "breadth": "narrow",
+      "enabled": true,
+      "origins": [
+        "https://nyaa.si"
+      ],
+      "site": "https://nyaa.si",
+      "request": {
+        "method": "GET",
+        "path": "/",
+        "query": {
+          "page": "rss",
+          "q": "{q}"
+        }
+      },
+      "namespaces": {
+        "nyaa": "https://nyaa.si/xmlns/nyaa"
+      },
+      "fields": {
+        "name": "title",
+        "infohash": "nyaa:infoHash",
+        "size_bytes": "nyaa:size",
+        "seeders": "nyaa:seeders",
+        "leechers": "nyaa:leechers",
+        "category": {
+          "from": "nyaa:categoryId",
+          "prefix": 1,
+          "map": {
+            "1": "video",
+            "2": "audio",
+            "3": "document",
+            "4": "video",
+            "5": "image",
+            "6": "software"
+          }
+        },
+        "first_seen": "pubDate",
+        "torrent_url": "link",
+        "description_url": "guid"
+      }
+    },
+    {
+      "name": "sukebei",
+      "kind": "rss",
+      "breadth": "narrow",
+      "enabled": true,
+      "origins": [
+        "https://sukebei.nyaa.si"
+      ],
+      "site": "https://sukebei.nyaa.si",
+      "request": {
+        "method": "GET",
+        "path": "/",
+        "query": {
+          "page": "rss",
+          "q": "{q}"
+        }
+      },
+      "namespaces": {
+        "nyaa": "https://sukebei.nyaa.si/xmlns/nyaa"
+      },
+      "fields": {
+        "name": "title",
+        "infohash": "nyaa:infoHash",
+        "size_bytes": "nyaa:size",
+        "seeders": "nyaa:seeders",
+        "leechers": "nyaa:leechers",
+        "first_seen": "pubDate",
+        "torrent_url": "link",
+        "description_url": "guid"
+      }
+    },
+    {
+      "name": "dmhy",
+      "kind": "rss",
+      "breadth": "narrow",
+      "enabled": true,
+      "origins": [
+        "https://share.dmhy.org"
+      ],
+      "site": "https://share.dmhy.org",
+      "request": {
+        "method": "GET",
+        "path": "/topics/rss/rss.xml",
+        "query": {
+          "keyword": "{q}"
+        },
+        "max_bytes": 262144
+      },
+      "fields": {
+        "name": "title",
+        "infohash": "enclosure@url",
+        "first_seen": "pubDate",
+        "description_url": "link"
+      }
+    },
+    {
+      "name": "eztvx",
+      "kind": "json",
+      "breadth": "narrow",
+      "enabled": true,
+      "origins": [
+        "https://eztvx.to"
+      ],
+      "site": "https://eztvx.to",
+      "request": {
+        "method": "GET",
+        "path": "/api/get-torrents",
+        "query": {
+          "limit": "{limit}",
+          "page": "1",
+          "Keywords": "{q}"
+        }
+      },
+      "rows": "torrents",
+      "fields": {
+        "name": "title",
+        "infohash": [
+          "hash",
+          "magnet_url"
+        ],
+        "size_bytes": {
+          "from": "size_bytes",
+          "nonzero": true
+        },
+        "seeders": "seeds",
+        "leechers": "peers",
+        "category": {
+          "const": "video"
+        },
+        "first_seen": "date_released_unix",
+        "description_url": "episode_url"
+      }
+    },
+    {
+      "name": "yts",
+      "kind": "json",
+      "breadth": "narrow",
+      "enabled": true,
+      "origins": [
+        "https://yts.gg",
+        "https://movies-api.accel.li",
+        "https://yts.bz",
+        "https://yts.lt"
+      ],
+      "site": "https://yts.gg",
+      "note": "Deployed Workers keep their built-in yts adapter and use this entry for its origins only.",
+      "request": {
+        "method": "GET",
+        "path": "/api/v2/list_movies.json",
+        "query": {
+          "query_term": "{q}",
+          "limit": "{limit}"
+        },
+        "limit_cap": 50
+      },
+      "rows": "data.movies[].torrents[]",
+      "fields": {
+        "name": "^.title_long",
+        "infohash": "hash",
+        "size_bytes": "size_bytes",
+        "seeders": "seeds",
+        "leechers": "peers",
+        "category": {
+          "const": "video"
+        },
+        "first_seen": "date_uploaded_unix",
+        "description_url": "^.url"
+      }
+    },
+    {
+      "name": "archive",
+      "kind": "json",
+      "breadth": "narrow",
+      "enabled": true,
+      "origins": [
+        "https://archive.org"
+      ],
+      "site": "https://archive.org",
+      "request": {
+        "method": "GET",
+        "path": "/advancedsearch.php",
+        "query": {
+          "q": "{q}",
+          "fl[]": "identifier,title,item_size,publicdate",
+          "sort[]": "downloads desc",
+          "rows": "{limit}",
+          "output": "json"
+        },
+        "limit_cap": 20
+      },
+      "rows": "response.docs",
+      "rows_required": true,
+      "fields": {
+        "name": "title",
+        "size_bytes": "item_size",
+        "first_seen": "publicdate",
+        "torrent_url": {
+          "template": "https://archive.org/download/{value}/{value}_archive.torrent",
+          "from": "identifier"
+        },
+        "description_url": {
+          "template": "https://archive.org/details/{value}",
+          "from": "identifier"
+        }
+      }
+    }
+  ]
+}
