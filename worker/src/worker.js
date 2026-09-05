@@ -3160,11 +3160,19 @@ const SEED_DESCRIPTORS = [
   {
     // TorrentDownload — a general index whose search page is one table, with
     // the infohash in every row's link. Seeder counts arrive with thousands
-    // separators ("4,341").
+    // separators ("4,341"). Off, and not for want of an answer: the site
+    // fabricates results. Asked for "gangnam malayalam" it returned "PSY
+    // GANGNAM STYLE HD Music Video malayalam mSD" with 3,965 seeders — a real
+    // release with the unmatched query word written into its name, so the
+    // magnet fetches something other than what it is called. A search that
+    // finds nothing is honest; this is not, so it stays out of every default
+    // roster and is here only so the descriptor and its fixture keep the
+    // `html` kind's tests honest. Do not enable it.
     name: "torrentdownload",
     kind: "html",
     breadth: "broad",
-    enabled: true,
+    enabled: false,
+    note: "Fabricates results — writes the query into unrelated release names (seen 2026-09-05). Left off on purpose; not a site to enable.",
     origins: ["https://www.torrentdownload.info"],
     site: "https://www.torrentdownload.info",
     request: { method: "GET", path: "/search", query: { q: "{q}" } },

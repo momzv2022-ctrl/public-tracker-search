@@ -42,15 +42,25 @@ Cloudflare account) ran one search and then `/api/v1/try` per engine:
 |---|---|---|
 | knaben, torrentscsv, rutor, yts, eztvx, animetosho, sukebei, dmhy, archive | answered, 475–2571 ms | on |
 | piratebay | HTTP 429 on the first search, 10 rows in 906 ms on the retry | on — rate limiting comes and goes |
-| torrentdownload | timed out at 3 s on the first search, 5 rows in 367–552 ms on the retries | on — a slow first connection. The page has a "Fast Links" advert table with the same class as the results, so five matched rows per page carry nothing and are counted as seen |
+| torrentdownload | answered (367–552 ms, after one 3 s timeout) — but **fabricates results**: asked for "gangnam malayalam" it returned "PSY GANGNAM STYLE HD Music Video malayalam mSD", 3,965 seeders — a real release with the unmatched query word written into its name. A tester's search for "malayalam" was full of these ("Disney Tangled … 2012 malayalam"). The page also has a "Fast Links" advert table with the same class as the results. | **off, and not to be enabled**: a site that invents rows poisons the merged list |
 | bitsearch | bitsearch.eu HTTP 429 on every request; solidtorrents.to an HTML interstitial (`<meta name…`) | **off by default** |
 | torrentdownloads | no answer before the 5 s timeout, every time; answers a browser at once | **off by default** |
 | torrentkitty | HTTP 403 in 3 ms | **off by default** |
 | nyaa | HTTP 525, then HTTP 429 — what UTSI's probes saw too | **off by default**; animetosho aggregates it |
 
-The four are `enabled: false` in the seed and the feed: still engines, still
-selectable by name in `UTSI_ENGINES`, and one feed edit away from being on for
-everybody if a site changes its mind.
+The four that refuse Cloudflare are `enabled: false` in the seed and the feed:
+still engines, still selectable by name in `UTSI_ENGINES`, and one feed edit
+away from being on for everybody if a site changes its mind. Note also that
+what a site answers differs by Cloudflare colo: a second Worker the same day
+saw torrentdownloads.pro answer a cached query in 8 ms and time out on a fresh
+one, and rutor answer where the first Worker got HTTP 525. Selecting by name in
+`UTSI_ENGINES` is the way to use an index your own Worker happens to reach.
+
+The rule torrentdownload broke is worth writing down: **an index that
+fabricates rows is worse than one that is down.** A dead engine costs a
+subrequest; an inventive one puts a wrong magnet under a plausible name in
+front of every user. Before adding an engine, ask it for something that does
+not exist ("xqzv malayalam") — an honest index returns nothing.
 
 ## Tried and left out (2026-09-05)
 

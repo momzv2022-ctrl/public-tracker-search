@@ -1,7 +1,7 @@
 # Public Tracker Search
 
-Search the public torrent indexes — eleven of them, at once — from a URL only
-you know.
+Search the public torrent indexes — ten of them, at once — from a URL only you
+know.
 
 One file, run for free by Cloudflare, asks the indexes your question and merges
 the answers into one list: names, sizes, seeders, and `magnet:` links. You get
@@ -73,7 +73,6 @@ in one list.
 | [Knaben](https://knaben.org) | everything — a meta-index over dozens of trackers, 1337x, RuTracker and The Pirate Bay among them, each row naming its tracker | JSON API |
 | [The Pirate Bay](https://apibay.org) | everything | JSON API |
 | [Torrents-CSV](https://torrents-csv.com) | everything — a DHT crawl | JSON API |
-| [TorrentDownload](https://www.torrentdownload.info) | everything | search page |
 | [Rutor](https://rutor.info) | everything, Russian-language | search page |
 | [YTS](https://yts.gg) | films | JSON API |
 | [EZTV](https://eztvx.to) | television | JSON API |
@@ -96,7 +95,11 @@ answers), [Torrent Kitty](https://www.torrentkitty.tv) (HTTP 403) and
 [Nyaa](https://nyaa.si) (HTTP 429; its releases arrive through Anime Tosho).
 Their descriptors are correct, so naming one in `UTSI_ENGINES` turns it on for
 a deployment the site happens to answer, and the feed can switch any of them
-back on for everybody the day that changes.
+back on for everybody the day that changes. A fifth,
+[TorrentDownload](https://www.torrentdownload.info), is off for a worse
+reason: it fabricates results, writing your query into unrelated release names
+with invented seeder counts, so a magnet from it fetches something other than
+what it is called. It is kept only as a test fixture; do not enable it.
 
 Sites behind a browser challenge cannot be read from a Worker at all, which is
 why 1337x, RuTracker, Kickass, MagnetDL, ExtraTorrent and the like are not in

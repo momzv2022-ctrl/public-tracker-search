@@ -1,9 +1,9 @@
 {
   "//": "The engine feed of public-tracker-search. Built from worker/src/worker.js by `npm run build`; a deployed Worker fetches it hourly. Data only.",
   "tgp_version": 1,
-  "serial": 2,
-  "issued_at": "2026-09-05T08:31:14Z",
-  "expires_at": "2026-11-04T08:31:14Z",
+  "serial": 3,
+  "issued_at": "2026-09-05T08:59:02Z",
+  "expires_at": "2026-11-04T08:59:02Z",
   "moved_to": null,
   "mirrors": [
     "https://momzv2022-ctrl.github.io/public-tracker-search/feed.json"
@@ -162,7 +162,8 @@
       "name": "torrentdownload",
       "kind": "html",
       "breadth": "broad",
-      "enabled": true,
+      "enabled": false,
+      "note": "Fabricates results — writes the query into unrelated release names (seen 2026-09-05). Left off on purpose; not a site to enable.",
       "origins": [
         "https://www.torrentdownload.info"
       ],

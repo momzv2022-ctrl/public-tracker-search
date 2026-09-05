@@ -1711,7 +1711,7 @@ const fromEnv = (pairs = {}) => readSettings({ UTSI_API_KEY: KEY, ...pairs });
 
 test("setting an upstream URL makes it the first engine", async () => {
   const WITHOUT_UPSTREAM = [
-    "knaben", "piratebay", "torrentscsv", "torrentdownload", "rutor",
+    "knaben", "piratebay", "torrentscsv", "rutor",
     "yts", "eztvx", "animetosho", "sukebei", "dmhy", "archive",
   ];
   assert.deepEqual(fromEnv().engines, WITHOUT_UPSTREAM);
@@ -1726,7 +1726,9 @@ test("setting an upstream URL makes it the first engine", async () => {
   // 2026-09-05, Cloudflare's addresses get 429, 403, an interstitial or no
   // answer from them. They are still engines — naming one in UTSI_ENGINES
   // turns it on for a deployment the site happens to answer.
-  for (const off of ["bitsearch", "torrentdownloads", "torrentkitty", "nyaa"]) {
+  // A fifth, torrentdownload, is off for a different reason: it fabricates
+  // results, writing the query into unrelated release names.
+  for (const off of ["bitsearch", "torrentdownloads", "torrentkitty", "nyaa", "torrentdownload"]) {
     assert.ok(!fromEnv().engines.includes(off), `${off} is off by default`);
     assert.equal(SEED_DESCRIPTORS.find((d) => d.name === off).enabled, false);
   }

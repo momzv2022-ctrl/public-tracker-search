@@ -1,8 +1,8 @@
 {
   "version": "0.1.1",
-  "sha256": "7ce62acc9116e15630e63bf649514a929549446fbf48a59974810ef547ffb96a",
-  "published": "2026-09-05T08:31:14Z",
-  "feed_serial": 2,
+  "sha256": "4eec920d9b7bbd905d1c7f4a98da1a348008066f676e7683d4fb549a51372916",
+  "published": "2026-09-05T08:59:02Z",
+  "feed_serial": 3,
   "engines": 15,
   "source": "https://github.com/momzv2022-ctrl/public-tracker-search/blob/main/worker/src/worker.js"
 }
