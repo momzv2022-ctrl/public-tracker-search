@@ -56,7 +56,7 @@ const API_KEY = "";
 
 // Bumped when the behaviour changes. `/healthz` reports it, and compares it
 // with the version the project publishes, so a Worker can tell you it is old.
-const VERSION = "0.1.1";
+const VERSION = "0.1.2";
 
 // Where `/healthz` looks for "is there a newer version". Reached from
 // `/healthz` only, never from a search, and never fatal: if it does not answer
@@ -3515,6 +3515,7 @@ function engineFor(engineId) {
 // and `expires_at` is what actually bounds the replay window.
 
 const FEED_REFRESH_MS = 3600 * 1000;
+const FEED_EDGE_CACHE_S = 600;
 const FEED_FETCH_TIMEOUT_S = 10;
 const FEED_MAX_BYTES = 1024 * 1024;
 const FEED_CACHE_KEY = "https://feed.public-tracker-search.internal/last-known-good";
@@ -3857,9 +3858,14 @@ function applyFeed(feed, source, fromCache) {
 // --- feed fetch, cache, refresh ----------------------------------------------
 
 async function fetchFeedText(http, feedUrl) {
+  // Ten minutes in Cloudflare's edge cache, not an hour: every Worker in a
+  // colo shares this copy, so the TTL is how long a repair takes to reach a
+  // deployment that asks — an hour here plus the hourly refresh was two hours
+  // in the worst case, and a fresh paste could be handed a feed older than its
+  // own seed. GitHub Pages serves the file with a ten-minute max-age anyway.
   const [status, body] = await http.text(feedUrl, {
     timeout: FEED_FETCH_TIMEOUT_S,
-    cf: { cacheTtl: 3600, cacheEverything: true },
+    cf: { cacheTtl: FEED_EDGE_CACHE_S, cacheEverything: true },
   });
   if (status !== 200) throw new FeedRejected(`HTTP ${status} fetching the feed`);
   if (!body || body.length > FEED_MAX_BYTES) throw new FeedRejected("feed is empty or oversized");
