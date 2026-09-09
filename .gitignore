@@ -1,8 +1,4 @@
 node_modules/
 .DS_Store
 *.log
-# Your real one, if you ever run this locally. The .example beside it is the
-# one that ships, and it is empty on purpose.
-.dev.vars
-
 # Nothing is generated except docs/, which is committed on purpose.

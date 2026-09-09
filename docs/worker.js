@@ -18,9 +18,7 @@
  * paste this in its place, Deploy. Do not give this file to Create's "Upload
  * and deploy", or to any drag-and-drop box — that flow publishes files as a
  * static site, so it would hand this one back as text at /worker.js and run
- * nothing. It says so itself the moment it sees a .js file. If you have a
- * terminal, `npx wrangler deploy worker.js --name public-tracker-search
- * --compatibility-date 2025-01-01` is the other way in.
+ * nothing. It says so itself the moment it sees a .js file.
  *
  * Layout, top to bottom:
  *
@@ -40,7 +38,7 @@
  * (github.com/momzv2022-ctrl/unified-torrent-search-interface) and speaks the
  * same API, so anything that talks to a UTSI talks to this. What changed: many
  * more indexes, search pages as engines, a feed that is plain HTTPS, and a
- * setup that is one paste, needing no account anywhere but Cloudflare.
+ * setup that is copy and paste rather than a link.
  *
  * https://github.com/momzv2022-ctrl/public-tracker-search
  * MIT licensed. No warranty. Laws differ where you are, and complying with

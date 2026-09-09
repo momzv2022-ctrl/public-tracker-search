@@ -2,19 +2,12 @@
   "name": "public-tracker-search",
   "private": true,
   "type": "module",
-  "description": "Present so that Node reads the .js files as ES modules. No dependencies and nothing to install; the lockfile beside it lists none, and is there only so a CI that insists on `npm ci` finds one.",
+  "description": "Present so that Node reads the .js files as ES modules. No dependencies, no install step, no lockfile.",
   "license": "MIT",
   "engines": { "node": ">=20" },
   "scripts": {
     "test": "node --test worker/tests/*.test.mjs",
     "build": "node worker/tools/build.mjs",
     "feed": "node worker/tools/feed.mjs build"
-  },
-  "cloudflare": {
-    "bindings": {
-      "UTSI_API_KEY": {
-        "description": "The key every request to your Worker must carry. Make one at [the setup page](https://momzv2022-ctrl.github.io/public-tracker-search/) \u2014 it mints one in your browser and sends it nowhere \u2014 or invent one of at least 16 characters. Your Worker shows it back to you on its front page. Leave it empty and the Worker refuses every request."
-      }
-    }
   }
 }

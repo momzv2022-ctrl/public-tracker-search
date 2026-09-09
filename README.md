@@ -14,8 +14,8 @@ whose Worker it grew out of, so anything that talks to a UTSI — the qBittorren
 plugin, [tracker-integration](https://github.com/momzv2022-ctrl/tracker-integration),
 any [Torrent Stream Protocol](https://github.com/raul2hot/torrent-stream-protocol)
 client — talks to this. What changed: three times the indexes, search pages
-read as engines and not only APIs, and a setup that is one paste, needing no
-account anywhere but Cloudflare.
+read as engines and not only APIs, and a setup that is copy and paste rather
+than a link.
 
 ## Set it up
 
@@ -34,44 +34,10 @@ a drag-and-drop box that publishes files as a static site. Drop `worker.js`
 into it and you get the file back as text at `/worker.js`, your address answers
 404, and nothing runs; it warns you on the way past ("this uploader does not
 yet support projects that require a build process"). Use *Edit code* and paste.
-With a terminal, `npx wrangler deploy worker.js --name public-tracker-search
---compatibility-date 2025-01-01` deploys the same file.
-
-### Or in one click, from here
-
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/momzv2022-ctrl/public-tracker-search)
-
-No paste at all: Cloudflare copies this repository into your own GitHub
-account, reads [`wrangler.jsonc`](wrangler.jsonc), and deploys. It asks for one
-thing — `UTSI_API_KEY` — and that is the key the setup page minted for you, so
-copy the key rather than the code and paste it there. Pushes to your copy
-redeploy it after that.
-
-What it costs, so you can decide: this route needs a **GitHub account**, and
-Cloudflare's GitHub App has to be let into it. It leaves a copy of this
-repository, under your name, on GitHub. The paste route needs neither, which is
-why it is still first.
-
-### Or in one click, without a GitHub account
-
-The setup page's third button, **Open it in Cloudflare's editor**, builds a
-link that carries the whole file — key and all — in the URL's fragment, the
-part a browser never sends to a server. It opens Cloudflare's
-[Playground](https://developers.cloudflare.com/workers/playground/) with your
-code in it and already running, beside a **Deploy** button. Nothing is
-uploaded, and the only account involved is the Cloudflare one.
-
-Two caveats, both printed on the page. The link is about 126,000 characters;
-Safari stops at 80,000, so this is Chrome, Firefox or Edge, and not an iPhone
-or an iPad. And the link format is Cloudflare's, undocumented, read off the
-live Playground — it can stop working without notice, which is why it is third
-and why the two routes above stay.
 
 The page makes no network request — the browser is told to refuse one — and
-the key never leaves it except inside the file you copy. On the paste route
-that file is the whole handover: no link, no account connection, nothing
-between the two windows but your clipboard. The button above trades exactly
-that away for a click, which is the choice it is there to give you.
+the key never leaves it except inside the file you copy. There is no link to
+Cloudflare and no account connection: the file is the whole handover.
 
 **Anyone who can open your Worker's address can read the key.** That is the
 trade for a setup with no dashboard in it. Keep the address to yourself, and

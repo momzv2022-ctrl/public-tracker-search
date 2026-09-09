@@ -55,12 +55,6 @@ button:not([disabled]):active { transform: translateY(1px); }
 .status { min-height: 1.35rem; margin-top: .5rem; font-size: .9rem; font-weight: 600; text-align: center; }
 .status.ok { color: var(--ok); } .status.bad { color: var(--bad); }
 .warn { background: var(--warnbg); color: var(--warn); border: 1px solid #f3d9b3; border-radius: var(--radius); padding: .8rem .9rem; font-size: .935rem; margin: 1rem 0; }
-.or { display: flex; align-items: center; gap: .8rem; color: var(--muted); font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; margin: 1.6rem 0 1rem; }
-.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-a.deploy { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 3.15rem; padding: .8rem 1rem;
-  font-weight: 600; font-size: 1.02rem; text-align: center; text-decoration: none; color: var(--ink);
-  background: var(--bg); border: 1px solid #c9c9c9; border-radius: 8px; }
-a.deploy:active { transform: translateY(1px); }
 .warn strong, .warn code { color: var(--warn); }
 .warn code { background: #fdf0dd; }
 @media (max-width: 420px) { .buttons { grid-template-columns: 1fr; } }
@@ -124,48 +118,7 @@ footer .mono { word-break: break-all; }
   back as text at <code>/worker.js</code>; nothing runs, and your address
   answers <em>404</em>. It warns you as it goes — <q>this uploader does not yet
   support projects that require a build process</q> — and that warning is about
-  this. The code editor is the way in. If you have a terminal,
-  <code>npx wrangler deploy worker.js</code> is the other one.
-</p>
-
-<p class="or">or</p>
-
-<p>
-  <a class="deploy" href="https://deploy.workers.cloudflare.com/?url=https://github.com/momzv2022-ctrl/public-tracker-search" rel="noopener">Deploy it from GitHub, in one click</a>
-</p>
-<p class="note">
-  No paste at all. Cloudflare copies the project into your own GitHub account,
-  reads its configuration, deploys it, and asks you for one thing:
-  <code>UTSI_API_KEY</code>. That is <strong>the key at the top of this
-  page</strong> — copy the key, not the code, and paste it there. Step 3 is the
-  same afterwards.
-</p>
-<p class="note">
-  What it costs, so the choice is yours: this route wants a <strong>GitHub
-  account</strong>, lets Cloudflare's GitHub app into it, and leaves a copy of
-  the project under your name there. Pasting wants none of that — which is why
-  it is the one above.
-</p>
-
-<p class="or">or</p>
-
-<p>
-  <button type="button" class="ghost" id="playground">Open it in Cloudflare's editor, ready to deploy</button>
-</p>
-<p class="note">
-  No paste and no GitHub account. The link carries the whole file — your key
-  with it — in the part of a URL that browsers never send to a server, so it is
-  built here and nothing is uploaded. It opens Cloudflare's Playground with
-  your code in it and already running, next to a <strong>Deploy</strong>
-  button.
-</p>
-<p class="note">
-  Two things to know. <strong>Chrome, Firefox or Edge</strong>: the link runs to
-  about 126,000 characters and Safari refuses anything past 80,000, which rules
-  out every browser on an iPhone or iPad. And this is the most breakable of the
-  three routes — the link format is Cloudflare's own and it is documented
-  nowhere, so it can stop working without notice, whereupon the two above still
-  will. Treat the link the way you treat the key: it contains it.
+  this. The code editor is the way in.
 </p>
 
 <h2><span class="n">3.</span> Open it</h2>
@@ -226,10 +179,8 @@ __ENGINE_ROWS__
 </main>
 
 <script>
-/* The generator and the link builder, inlined so this page has no second file
-   to load. */
+/* The generator, inlined so this page has no second file to load. */
 __GENERATOR_LIB__
-__PLAYGROUND_LIB__
 </script>
 <script>
 /* The file, as one string. */
@@ -256,7 +207,6 @@ var SOURCE = __WORKER_SOURCE__;
       say(String(error && error.message || error), "bad");
       byId("copy").disabled = true;
       byId("download").disabled = true;
-      byId("playground").disabled = true;
     }
   }
 
@@ -312,23 +262,6 @@ var SOURCE = __WORKER_SOURCE__;
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     say("Saved. Open it, copy all of it, and paste it into the Worker's code editor — do not upload the file.", "ok");
-  });
-
-  /* The link is built only when it is asked for: compressing the file takes
-     long enough to be felt, and most people will paste instead. */
-  byId("playground").addEventListener("click", function () {
-    if (!code) return;
-    var url;
-    try {
-      url = playgroundUrl(code);
-    } catch (error) {
-      return say(String(error && error.message || error), "bad");
-    }
-    if (window.open(url, "_blank", "noopener")) {
-      say("Opened Cloudflare's editor with your file in it. Press Deploy there.", "ok");
-    } else {
-      say("Your browser stopped the new tab from opening. Allow pop-ups for this page, then press it again.", "bad");
-    }
   });
 
   refresh();
