@@ -34,8 +34,23 @@ const FIXTURES = join(REPO, "worker", "tests", "fixtures");
 const FEED_PATH = join(DOCS, "feed.json");
 const PAGES_BASE = "https://momzv2022-ctrl.github.io/public-tracker-search/";
 
-/** How long a feed stands before a Worker stops trusting it and falls back to its seed. */
-export const EXPIRES_DAYS = 60;
+/**
+ * How long a feed stands before a Worker stops trusting it and falls back to
+ * its seed.
+ *
+ * It is two things at once. A deployed Worker that cannot reach a live feed
+ * keeps searching on the engines compiled into it, so an expiry that passes is
+ * a quiet loss of engine fixes rather than an outage — but it is quiet, and
+ * nothing in this repository will remind anyone. It is also the real bound on
+ * replaying an old feed: the Cache API is per-colo and evictable, so a cold
+ * colo has no memory of the highest serial and this date is what limits how
+ * stale a feed may be and still be believed.
+ *
+ * Six months balances the two. `feedIsFresh` renews at half-life, so any build
+ * committed within ninety days carries every deployed Worker forward, and two
+ * commits a year is enough to keep the feed alive indefinitely.
+ */
+export const EXPIRES_DAYS = 180;
 
 /**
  * The recorded answer each engine is replayed against. An engine without one

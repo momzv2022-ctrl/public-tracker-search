@@ -1,9 +1,9 @@
 {
   "//": "The engine feed of public-tracker-search. Built from worker/src/worker.js by `npm run build`; a deployed Worker fetches it hourly. Data only.",
   "tgp_version": 1,
-  "serial": 3,
-  "issued_at": "2026-09-05T08:59:02Z",
-  "expires_at": "2026-11-04T08:59:02Z",
+  "serial": 4,
+  "issued_at": "2026-09-09T10:24:00Z",
+  "expires_at": "2027-03-08T10:24:00Z",
   "moved_to": null,
   "mirrors": [
     "https://momzv2022-ctrl.github.io/public-tracker-search/feed.json"
