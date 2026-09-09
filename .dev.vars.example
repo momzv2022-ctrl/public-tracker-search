@@ -1,0 +1,15 @@
+# The key every request to your Worker has to carry.
+#
+# A one-click deploy asks for this by name, and Wrangler reads it when you run
+# the Worker locally. Without a key the Worker refuses every request, on
+# purpose: the address is live and public from the moment it deploys, and an
+# open search proxy is found within hours.
+#
+# Make one at https://momzv2022-ctrl.github.io/public-tracker-search/ — the
+# page mints it in your browser and never sends it anywhere — or invent one of
+# at least 16 characters. Your Worker shows it back to you on its front page
+# once it is running, so there is nothing to write down.
+#
+# This line stays empty in the repository. A key committed here would not be a
+# default; it would be everybody's key.
+UTSI_API_KEY=

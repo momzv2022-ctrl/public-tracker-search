@@ -145,6 +145,53 @@ test("the page, the file and the README all name the flow that looks right and i
   assert.ok(readFileSync(join(REPO, "README.md"), "utf8").includes("Upload and deploy"), "and so does the README");
 });
 
+// ───────────────────────────────────────────────────────────────────────────
+// The one-click route
+// ───────────────────────────────────────────────────────────────────────────
+
+test("wrangler.jsonc points a one-click deploy at the file that is the program", () => {
+  const config = readFileSync(join(REPO, "wrangler.jsonc"), "utf8");
+  const main = config.match(/^\s*"main":\s*"([^"]+)",?$/m);
+  assert.ok(main, "no main");
+  assert.equal(main[1], "worker/src/worker.js");
+  assert.ok(existsSync(join(REPO, main[1])), `main points at ${main[1]}, which is not there`);
+  assert.match(config, /^\s*"compatibility_date":\s*"\d{4}-\d{2}-\d{2}",?$/m);
+  // The workers.dev address is the whole product of a deployment: it is what
+  // the Worker prints on its own front page and what the app is pointed at.
+  assert.match(config, /^\s*"workers_dev":\s*true,?$/m);
+  // Nothing to provision. A binding here would mean a deploy that has to ask
+  // for resources, and a route that can fail in ways the paste route cannot.
+  for (const binding of ["kv_namespaces", "d1_databases", "r2_buckets", "queues", "durable_objects"]) {
+    assert.ok(!config.includes(binding), `${binding} in wrangler.jsonc — the one-click route provisions nothing`);
+  }
+});
+
+test("the secret the deploy asks for is declared, described, and shipped empty", () => {
+  // Cloudflare reads .dev.vars.example to know what to prompt for, and
+  // package.json to know what to say about it. The value must stay empty: a
+  // key committed here would not be a default, it would be everybody's key.
+  const example = readFileSync(join(REPO, ".dev.vars.example"), "utf8");
+  const line = example.match(/^UTSI_API_KEY=(.*)$/m);
+  assert.ok(line, ".dev.vars.example does not declare UTSI_API_KEY");
+  assert.equal(line[1].trim(), "", "a key shipped in .dev.vars.example would be everybody's key");
+  const pkg = JSON.parse(readFileSync(join(REPO, "package.json"), "utf8"));
+  const described = pkg.cloudflare?.bindings?.UTSI_API_KEY?.description || "";
+  assert.ok(described.includes("momzv2022-ctrl.github.io"), "the prompt should say where to get a key");
+  assert.ok(described.includes("16"), "and that a short key is refused");
+  // The name has to be the one the Worker actually reads.
+  assert.ok(SOURCE.includes('envText(env, "UTSI_API_KEY")'), "the Worker reads a differently named variable");
+  assert.ok(readFileSync(join(REPO, ".gitignore"), "utf8").includes(".dev.vars"), "a real .dev.vars must never be committed");
+});
+
+test("both routes are offered, and what the one-click route costs is said", () => {
+  const page = read("index.html");
+  const button = "https://deploy.workers.cloudflare.com/?url=https://github.com/momzv2022-ctrl/public-tracker-search";
+  assert.ok(page.includes(button), "the setup page does not offer the one-click route");
+  assert.ok(readFileSync(join(REPO, "README.md"), "utf8").includes(button), "the README does not");
+  assert.ok(page.includes("UTSI_API_KEY"), "and it must say which secret to paste the key into");
+  assert.ok(/GitHub\s*<\/strong>\s*account|GitHub\s+account/.test(page), "the GitHub account this route needs is not mentioned");
+});
+
 test("docs/feed.json is the seed, unexpired, and readable by the Worker", () => {
   assert.ok(feedIsCurrent(), "docs/feed.json lags the seed — run `npm run build`");
   const feed = __testing.readFeed(read("feed.json"), Date.now());

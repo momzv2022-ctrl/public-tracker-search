@@ -40,7 +40,7 @@
  * (github.com/momzv2022-ctrl/unified-torrent-search-interface) and speaks the
  * same API, so anything that talks to a UTSI talks to this. What changed: many
  * more indexes, search pages as engines, a feed that is plain HTTPS, and a
- * setup that is copy and paste rather than a link.
+ * setup that is one paste, needing no account anywhere but Cloudflare.
  *
  * https://github.com/momzv2022-ctrl/public-tracker-search
  * MIT licensed. No warranty. Laws differ where you are, and complying with
