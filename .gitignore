@@ -1,4 +1,7 @@
 node_modules/
 .DS_Store
 *.log
+# Your Worker's URL and key, for `npm run probe`. The key is a key.
+.probe.local
+
 # Nothing is generated except docs/, which is committed on purpose.

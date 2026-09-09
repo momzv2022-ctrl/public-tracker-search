@@ -8,6 +8,7 @@
   "scripts": {
     "test": "node --test worker/tests/*.test.mjs",
     "build": "node worker/tools/build.mjs",
-    "feed": "node worker/tools/feed.mjs build"
+    "feed": "node worker/tools/feed.mjs build",
+    "probe": "node worker/tools/probe.mjs"
   }
 }

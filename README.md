@@ -126,6 +126,10 @@ unreachable, expired or malformed changes nothing: the Worker keeps the last
 good one, or the definitions compiled into the file. `UTSI_FEED=0` turns it
 off.
 
+What keeps the feed itself honest is `npm run probe`, which asks a deployed
+Worker which indexes still answer *it* and takes the ones that no longer do out
+of the published feed. See [For whoever maintains this](#for-whoever-maintains-this).
+
 ## Settings
 
 Everything is optional. Set them under the Worker's *Settings → Variables and

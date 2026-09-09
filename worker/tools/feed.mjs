@@ -7,7 +7,8 @@
  *
  * There is one source of truth — `SEED_DESCRIPTORS` in `worker/src/worker.js`,
  * where every engine sits next to the reasoning that put it there — and the
- * feed is that list, published. A deployed Worker fetches it hourly, so an
+ * feed is that list, published, minus whatever `npm run probe` last found a
+ * deployed Worker could not reach (`unreachable.json`). A deployed Worker fetches it hourly, so an
  * edit to the seed reaches every deployment on the next refresh, and a new
  * paste has it compiled in. To repair an engine: edit its descriptor in the
  * Worker, run `npm run build`, commit, push.
@@ -32,6 +33,7 @@ const REPO = join(HERE, "..", "..");
 const DOCS = join(REPO, "docs");
 const FIXTURES = join(REPO, "worker", "tests", "fixtures");
 const FEED_PATH = join(DOCS, "feed.json");
+export const UNREACHABLE_PATH = join(HERE, "unreachable.json");
 const PAGES_BASE = "https://momzv2022-ctrl.github.io/public-tracker-search/";
 
 /**
@@ -89,8 +91,47 @@ const replaySettings = () => ({ engineUrls: {}, maxRowsPerEngine: 100, engineTim
 const replayQuery = { q: "replay", terms: "replay", cat: "", year: "", res: "", minSeeders: 0 };
 
 /** The feed's engines, as data: the seed with nothing added and nothing lost. */
-export function feedEngines() {
+/**
+ * The seed exactly as it is written, before anything the probe has learned.
+ * `enabled` here is somebody's judgement — read the descriptor's comment.
+ */
+export function seedEngines() {
   return JSON.parse(JSON.stringify(SEED_DESCRIPTORS));
+}
+
+/**
+ * What a deployed Worker could not reach, last time `npm run probe` asked one.
+ *
+ * Missing, empty or unreadable all mean the same thing: nothing known, so
+ * nothing changed. This file is written by a machine and read by a build, and
+ * neither is a good place to fail loudly over a stray character.
+ */
+export function unreachable() {
+  if (!existsSync(UNREACHABLE_PATH)) return { engines: {} };
+  try {
+    const parsed = JSON.parse(readFileSync(UNREACHABLE_PATH, "utf8"));
+    return parsed && typeof parsed === "object" && parsed.engines && typeof parsed.engines === "object"
+      ? parsed
+      : { engines: {} };
+  } catch {
+    return { engines: {} };
+  }
+}
+
+/**
+ * The engines the feed publishes: the seed, with anything the probe found
+ * unreachable switched off.
+ *
+ * The overlay only ever narrows. It can take an engine out of the default
+ * roster; it can never put one in that the seed has off, because the seed's
+ * reasons are not all reachability — `torrentdownload` answers perfectly and
+ * fabricates what it answers with. So the worst a wrong entry in
+ * `unreachable.json` can do is cost coverage until the next probe.
+ */
+export function feedEngines(down = unreachable().engines) {
+  return seedEngines().map((engine) =>
+    Object.prototype.hasOwnProperty.call(down, engine.name) ? { ...engine, enabled: false } : engine,
+  );
 }
 
 /** Validate the seed and replay every engine with a fixture. Throws on the first problem. */

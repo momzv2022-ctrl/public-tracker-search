@@ -1,0 +1,6 @@
+{
+  "//": "Written by `npm run probe -- --fix`: indexes a deployed Worker could not reach, so the feed can stop asking for them. Only ever narrows what the feed enables; an index the seed turns off stays off whatever is here.",
+  "checked_at": null,
+  "worker": null,
+  "engines": {}
+}
