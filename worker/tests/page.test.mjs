@@ -16,6 +16,7 @@ import { dirname, join } from "node:path";
 
 import { __testing } from "../src/worker.js";
 import { BLANKS, generate, literal, mintKey, sourceUsable } from "../tools/generator.js";
+import { SAFARI_URL_LIMIT, compressToEncodedURIComponent, playgroundPayload, playgroundUrl } from "../tools/playground.js";
 import { REPLAY_FIXTURES, feedEngines, feedIsCurrent } from "../tools/feed.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -191,6 +192,123 @@ test("both routes are offered, and what the one-click route costs is said", () =
   assert.ok(page.includes("UTSI_API_KEY"), "and it must say which secret to paste the key into");
   assert.ok(/GitHub\s*<\/strong>\s*account|GitHub\s+account/.test(page), "the GitHub account this route needs is not mentioned");
 });
+
+test("the playground link decodes back to the exact file, key and all", () => {
+  // The far side is Cloudflare's decoder and it cannot tell us we were nearly
+  // right — a link that decompresses to something else just opens an editor
+  // full of garbage. So the test is a decoder written the other way round from
+  // the spec, and the assertion is byte equality. The format itself was read
+  // off the live Playground on 2026-09-09 and a generated link was opened
+  // there: the editor held this file and its preview served this Worker's
+  // front page.
+  const key = "abcd-efgh-jkmn-pqrs-tuvw-xyz2";
+  const { code } = generate(SOURCE, { key });
+  const url = playgroundUrl(code);
+  assert.ok(url.startsWith("https://workers.cloudflare.com/playground#"));
+  const decoded = decompressFromEncodedURIComponent(url.slice(url.indexOf("#") + 1));
+  assert.equal(decoded, playgroundPayload(code), "the link does not decode to the payload it was made from");
+  assert.ok(decoded.includes(code), "the file did not survive the round trip");
+  assert.ok(decoded.includes(`const API_KEY = "${key}";`), "and neither did the key");
+  assert.match(decoded, /^multipart\/form-data; boundary=(-{4}[A-Za-z]+):/);
+  assert.ok(decoded.includes('"main_module":"index.js"'), "Cloudflare needs to be told which part is the program");
+  assert.ok(decoded.trimEnd().endsWith("--"), "the multipart body is not closed");
+});
+
+test("known answers, so a rewrite of the compressor cannot drift quietly", () => {
+  // Frozen output, not an independent oracle: what makes it trustworthy is
+  // that a link built by this code was opened in the real Playground and
+  // decoded there. These pin the behaviour so a later tidy-up of the bit
+  // writing cannot change it without a test going red. The last one is the
+  // surrogate-free path above 255, which takes the 16-bit marker.
+  const vectors = {
+    "": "Q",
+    a: "IZA",
+    "Hello, world!": "BIUwNmD2A0AEDukBOYAmBCIA",
+    aaaaaaaaaaaaaaaaaaab: "IY19gRkA",
+    "日本語": "qemhpzR5UUA",
+  };
+  for (const [input, expected] of Object.entries(vectors)) {
+    assert.equal(compressToEncodedURIComponent(input), expected, JSON.stringify(input));
+  }
+});
+
+test("the link is too long for Safari, and the page says so rather than pretending", () => {
+  const { code } = generate(SOURCE, { key: "abcd-efgh-jkmn-pqrs-tuvw-xyz2" });
+  const url = playgroundUrl(code);
+  // Not an aspiration — a fact about this file, recorded so that if it ever
+  // does fit, the warning on the page can come down.
+  assert.ok(url.length > SAFARI_URL_LIMIT, `the link is ${url.length} characters and would now fit Safari`);
+  assert.ok(url.length < 2_000_000, "and Chrome would refuse it");
+  const page = read("index.html");
+  assert.ok(page.includes("Chrome, Firefox or Edge"), "the page does not name the browsers this works in");
+  assert.ok(page.includes("80,000"), "nor the limit that rules the others out");
+  assert.ok(page.includes("function playgroundUrl("), "the link builder is not inlined in the page");
+});
+
+/**
+ * lz-string's decompressFromEncodedURIComponent, written from the format
+ * rather than from our compressor, so the two agreeing means something.
+ */
+function decompressFromEncodedURIComponent(input) {
+  const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+  const value = (c) => ALPHABET.indexOf(c);
+  let index = 1;
+  let word = value(input.charAt(0));
+  let position = 32;
+  const bits = (count) => {
+    let out = 0;
+    let power = 1;
+    for (let i = 0; i < count; i += 1) {
+      const bit = word & position;
+      position >>= 1;
+      if (position === 0) {
+        position = 32;
+        word = value(input.charAt(index));
+        index += 1;
+      }
+      out |= (bit > 0 ? 1 : 0) * power;
+      power <<= 1;
+    }
+    return out;
+  };
+
+  const dictionary = ["", "", ""];
+  let enlargeIn = 4;
+  let numBits = 3;
+  let entry;
+  let next = bits(2);
+  if (next === 2) return "";
+  let c = String.fromCharCode(bits(next === 0 ? 8 : 16));
+  dictionary[3] = c;
+  let w = c;
+  const result = [c];
+  for (;;) {
+    if (index > input.length) return "";
+    let code = bits(numBits);
+    if (code === 0 || code === 1) {
+      dictionary.push(String.fromCharCode(bits(code === 0 ? 8 : 16)));
+      code = dictionary.length - 1;
+      enlargeIn -= 1;
+      if (enlargeIn === 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits += 1;
+      }
+    } else if (code === 2) {
+      return result.join("");
+    }
+    if (dictionary[code] !== undefined) entry = dictionary[code];
+    else if (code === dictionary.length) entry = w + w.charAt(0);
+    else throw new Error("the link does not decode");
+    result.push(entry);
+    dictionary.push(w + entry.charAt(0));
+    enlargeIn -= 1;
+    w = entry;
+    if (enlargeIn === 0) {
+      enlargeIn = Math.pow(2, numBits);
+      numBits += 1;
+    }
+  }
+}
 
 test("docs/feed.json is the seed, unexpired, and readable by the Worker", () => {
   assert.ok(feedIsCurrent(), "docs/feed.json lags the seed — run `npm run build`");

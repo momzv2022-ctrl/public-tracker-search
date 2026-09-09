@@ -36,6 +36,7 @@ const OUT = join(REPO, "docs");
 const SOURCE_PATH = join(REPO, "worker", "src", "worker.js");
 const PAGE_PATH = join(HERE, "page.html");
 const GENERATOR_PATH = join(HERE, "generator.js");
+const PLAYGROUND_PATH = join(HERE, "playground.js");
 const PLUGIN_PATH = join(REPO, "qbittorrent", "utsi.py");
 
 const REPO_URL = "https://github.com/momzv2022-ctrl/public-tracker-search";
@@ -96,24 +97,30 @@ export async function build({ log = console.log } = {}) {
   const sha256 = createHash("sha256").update(source, "utf8").digest("hex");
 
   /**
-   * `generator.js` as a plain script, for inlining. It is written as an ES
-   * module so the tests can import it; the page wants the same functions as
-   * ordinary globals. Dropping the `export` keyword is the whole conversion,
-   * which is why the file has no imports and no Node APIs.
+   * The two libraries the page needs, as plain scripts, for inlining. Both are
+   * written as ES modules so the tests can import them; the page wants the same
+   * functions as ordinary globals. Dropping the `export` keyword is the whole
+   * conversion, which is why neither file has imports or Node APIs.
    */
-  const generator = readFileSync(GENERATOR_PATH, "utf8").replace(/^export /gm, "");
-  if (/^\s*import\b|\brequire\(/m.test(generator)) throw new Error("worker/tools/generator.js must stay dependency-free");
-  if (generator.includes("</script")) throw new Error("generator.js must not contain </script");
+  const inlineModule = (path, name) => {
+    const text = readFileSync(path, "utf8").replace(/^export /gm, "");
+    if (/^\s*import\b|\brequire\(/m.test(text)) throw new Error(`worker/tools/${name} must stay dependency-free`);
+    if (/<\/script|<!--|<script/i.test(text)) throw new Error(`${name} must not contain a sequence that ends a script block`);
+    return text;
+  };
+  const generator = inlineModule(GENERATOR_PATH, "generator.js");
+  const playground = inlineModule(PLAYGROUND_PATH, "playground.js");
 
   const engines = feedEngines();
   const page = readFileSync(PAGE_PATH, "utf8")
     .replace("__GENERATOR_LIB__", () => generator)
+    .replace("__PLAYGROUND_LIB__", () => playground)
     .replace("__WORKER_SOURCE__", () => inlineLiteral(source))
     .replace("__ENGINE_ROWS__", () => engineRows(engines))
     .replace(/__ENGINE_COUNT__/g, String(engines.filter((engine) => engine.enabled !== false).length))
     .replace(/__SHA256__/g, sha256)
     .replace(/__VERSION__/g, version[1]);
-  for (const placeholder of ["__GENERATOR_LIB__", "__WORKER_SOURCE__", "__ENGINE_ROWS__", "__ENGINE_COUNT__", "__SHA256__", "__VERSION__"]) {
+  for (const placeholder of ["__GENERATOR_LIB__", "__PLAYGROUND_LIB__", "__WORKER_SOURCE__", "__ENGINE_ROWS__", "__ENGINE_COUNT__", "__SHA256__", "__VERSION__"]) {
     if (page.includes(placeholder)) throw new Error(`the setup page still has ${placeholder} in it`);
   }
 
@@ -141,6 +148,18 @@ export async function build({ log = console.log } = {}) {
       2,
     ) + "\n",
   );
+
+  // Every script block has to parse. The page inlines two modules into one
+  // block, and two files that each declare a sensible `const ALPHABET` make a
+  // page that throws on load and shows an empty key box — with nothing in the
+  // build output to say so. Cheap to check, invisible when it breaks.
+  for (const [index, block] of [...page.matchAll(/<script>([\s\S]*?)<\/script>/g)].entries()) {
+    try {
+      new Function(block[1]);
+    } catch (thrown) {
+      throw new Error(`the setup page's script block ${index} does not parse: ${thrown.message}`);
+    }
+  }
 
   const pageBytes = Buffer.byteLength(page);
   if (pageBytes > 2 * 1024 * 1024) throw new Error(`the setup page is ${pageBytes} bytes`);

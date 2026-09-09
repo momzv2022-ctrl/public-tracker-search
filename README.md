@@ -52,6 +52,21 @@ Cloudflare's GitHub App has to be let into it. It leaves a copy of this
 repository, under your name, on GitHub. The paste route needs neither, which is
 why it is still first.
 
+### Or in one click, without a GitHub account
+
+The setup page's third button, **Open it in Cloudflare's editor**, builds a
+link that carries the whole file — key and all — in the URL's fragment, the
+part a browser never sends to a server. It opens Cloudflare's
+[Playground](https://developers.cloudflare.com/workers/playground/) with your
+code in it and already running, beside a **Deploy** button. Nothing is
+uploaded, and the only account involved is the Cloudflare one.
+
+Two caveats, both printed on the page. The link is about 126,000 characters;
+Safari stops at 80,000, so this is Chrome, Firefox or Edge, and not an iPhone
+or an iPad. And the link format is Cloudflare's, undocumented, read off the
+live Playground — it can stop working without notice, which is why it is third
+and why the two routes above stay.
+
 The page makes no network request — the browser is told to refuse one — and
 the key never leaves it except inside the file you copy. On the paste route
 that file is the whole handover: no link, no account connection, nothing

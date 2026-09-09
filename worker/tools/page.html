@@ -147,6 +147,27 @@ footer .mono { word-break: break-all; }
   it is the one above.
 </p>
 
+<p class="or">or</p>
+
+<p>
+  <button type="button" class="ghost" id="playground">Open it in Cloudflare's editor, ready to deploy</button>
+</p>
+<p class="note">
+  No paste and no GitHub account. The link carries the whole file — your key
+  with it — in the part of a URL that browsers never send to a server, so it is
+  built here and nothing is uploaded. It opens Cloudflare's Playground with
+  your code in it and already running, next to a <strong>Deploy</strong>
+  button.
+</p>
+<p class="note">
+  Two things to know. <strong>Chrome, Firefox or Edge</strong>: the link runs to
+  about 126,000 characters and Safari refuses anything past 80,000, which rules
+  out every browser on an iPhone or iPad. And this is the most breakable of the
+  three routes — the link format is Cloudflare's own and it is documented
+  nowhere, so it can stop working without notice, whereupon the two above still
+  will. Treat the link the way you treat the key: it contains it.
+</p>
+
 <h2><span class="n">3.</span> Open it</h2>
 <p>
   Open the Worker's address — the <strong>Visit</strong> link, or the
@@ -205,8 +226,10 @@ __ENGINE_ROWS__
 </main>
 
 <script>
-/* The generator, inlined so this page has no second file to load. */
+/* The generator and the link builder, inlined so this page has no second file
+   to load. */
 __GENERATOR_LIB__
+__PLAYGROUND_LIB__
 </script>
 <script>
 /* The file, as one string. */
@@ -233,6 +256,7 @@ var SOURCE = __WORKER_SOURCE__;
       say(String(error && error.message || error), "bad");
       byId("copy").disabled = true;
       byId("download").disabled = true;
+      byId("playground").disabled = true;
     }
   }
 
@@ -288,6 +312,23 @@ var SOURCE = __WORKER_SOURCE__;
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     say("Saved. Open it, copy all of it, and paste it into the Worker's code editor — do not upload the file.", "ok");
+  });
+
+  /* The link is built only when it is asked for: compressing the file takes
+     long enough to be felt, and most people will paste instead. */
+  byId("playground").addEventListener("click", function () {
+    if (!code) return;
+    var url;
+    try {
+      url = playgroundUrl(code);
+    } catch (error) {
+      return say(String(error && error.message || error), "bad");
+    }
+    if (window.open(url, "_blank", "noopener")) {
+      say("Opened Cloudflare's editor with your file in it. Press Deploy there.", "ok");
+    } else {
+      say("Your browser stopped the new tab from opening. Allow pop-ups for this page, then press it again.", "bad");
+    }
   });
 
   refresh();
