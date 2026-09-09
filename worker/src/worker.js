@@ -13,6 +13,15 @@
  * about to put it in your own Cloudflare account, and a program you cannot read
  * is one you have to take on trust.
  *
+ * It is pasted, not uploaded. In the Cloudflare dashboard: Workers & Pages,
+ * Create, Start with Hello World, Deploy; then Edit code, select everything,
+ * paste this in its place, Deploy. Do not give this file to Create's "Upload
+ * and deploy", or to any drag-and-drop box — that flow publishes files as a
+ * static site, so it would hand this one back as text at /worker.js and run
+ * nothing. It says so itself the moment it sees a .js file. If you have a
+ * terminal, `npx wrangler deploy worker.js --name public-tracker-search
+ * --compatibility-date 2025-01-01` is the other way in.
+ *
  * Layout, top to bottom:
  *
  *   1. your key            — the one line the setup page writes for you

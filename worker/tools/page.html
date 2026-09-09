@@ -13,6 +13,7 @@
 :root {
   --bg: #ffffff; --ink: #111111; --muted: #666666; --line: #e5e5e5; --soft: #fafafa;
   --code: #f6f6f6; --accent: #ba5a08; --ok: #17603a; --bad: #a3211a; --radius: 10px;
+  --warn: #8a4b00; --warnbg: #fff7ec;
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -53,6 +54,9 @@ button[disabled] { opacity: .45; cursor: not-allowed; }
 button:not([disabled]):active { transform: translateY(1px); }
 .status { min-height: 1.35rem; margin-top: .5rem; font-size: .9rem; font-weight: 600; text-align: center; }
 .status.ok { color: var(--ok); } .status.bad { color: var(--bad); }
+.warn { background: var(--warnbg); color: var(--warn); border: 1px solid #f3d9b3; border-radius: var(--radius); padding: .8rem .9rem; font-size: .935rem; margin: 1rem 0; }
+.warn strong, .warn code { color: var(--warn); }
+.warn code { background: #fdf0dd; }
 @media (max-width: 420px) { .buttons { grid-template-columns: 1fr; } }
 
 table.engines { width: 100%; border-collapse: collapse; font-size: .93rem; margin: .6rem 0; }
@@ -91,14 +95,15 @@ footer .mono { word-break: break-all; }
   <textarea id="code" readonly spellcheck="false" aria-label="worker.js"></textarea>
   <div class="buttons">
     <button type="button" id="copy">Copy the code</button>
-    <button type="button" class="ghost" id="download">Download worker.js</button>
+    <button type="button" class="ghost" id="download">Save worker.js</button>
   </div>
   <div class="status" id="status" role="status" aria-live="polite"></div>
 </div>
 <p class="note">
   The key is already inside the file, on the <code>API_KEY</code> line near the
   top. You do not need to write it down: the Worker shows it to you once it is
-  running.
+  running. <strong>Save</strong> keeps a copy on your computer, to open and
+  paste later — it is not a file you upload anywhere.
 </p>
 
 <h2><span class="n">2.</span> Put it on Cloudflare</h2>
@@ -106,6 +111,16 @@ footer .mono { word-break: break-all; }
   <li>Sign in at <a href="https://dash.cloudflare.com/" rel="noopener">dash.cloudflare.com</a> (free, no card; an email address and a password). Open <strong>Workers &amp; Pages</strong>, press <strong>Create</strong>, choose <strong>Start with Hello World</strong>, and press <strong>Deploy</strong>.</li>
   <li>Press <strong>Edit code</strong>. Select everything in the editor, delete it, paste the code from above, and press <strong>Deploy</strong>.</li>
 </ol>
+<p class="warn">
+  <strong>Not <em>Upload and deploy</em>.</strong> Cloudflare's other
+  <em>Create</em> button takes a drag-and-drop pile of files and publishes them
+  as a <em>static site</em>. Give it <code>worker.js</code> and you get the file
+  back as text at <code>/worker.js</code>; nothing runs, and your address
+  answers <em>404</em>. It warns you as it goes — <q>this uploader does not yet
+  support projects that require a build process</q> — and that warning is about
+  this. The code editor is the way in. If you have a terminal,
+  <code>npx wrangler deploy worker.js</code> is the other one.
+</p>
 
 <h2><span class="n">3.</span> Open it</h2>
 <p>
@@ -247,7 +262,7 @@ var SOURCE = __WORKER_SOURCE__;
     a.click();
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-    say("Downloaded. Paste its contents into your Worker and press Deploy.", "ok");
+    say("Saved. Open it, copy all of it, and paste it into the Worker's code editor — do not upload the file.", "ok");
   });
 
   refresh();

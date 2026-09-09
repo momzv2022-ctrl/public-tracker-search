@@ -29,6 +29,14 @@ than a link.
 3. Open the Worker's address. It shows your URL and your key, ready for the
    app, and a button that runs a real search.
 
+**It is pasted, not uploaded.** *Create* offers *Upload and deploy* as well —
+a drag-and-drop box that publishes files as a static site. Drop `worker.js`
+into it and you get the file back as text at `/worker.js`, your address answers
+404, and nothing runs; it warns you on the way past ("this uploader does not
+yet support projects that require a build process"). Use *Edit code* and paste.
+With a terminal, `npx wrangler deploy worker.js --name public-tracker-search
+--compatibility-date 2025-01-01` deploys the same file.
+
 The page makes no network request — the browser is told to refuse one — and
 the key never leaves it except inside the file you copy. There is no link to
 Cloudflare and no account connection: the file is the whole handover.

@@ -132,6 +132,19 @@ test("the inlined source survives the HTML parser and comes back byte for byte",
   assert.equal(value, SOURCE, "and JavaScript reads the same bytes back");
 });
 
+test("the page, the file and the README all name the flow that looks right and is not", () => {
+  // A saved `.js` invites Cloudflare's other Create button — `Upload and
+  // deploy`, a drag-and-drop box that publishes files as a static site. It
+  // takes worker.js happily, serves it back as text and runs nothing, so the
+  // address 404s and the person has no idea why. The only cure is saying so
+  // in all three places the mistake can be made from.
+  const page = read("index.html");
+  assert.ok(page.includes("Upload and deploy"), "the setup page names it");
+  assert.ok(page.includes("do not upload the file"), "and says so again after a save");
+  assert.ok(SOURCE.includes("It is pasted, not uploaded."), "the file says it to whoever opens it");
+  assert.ok(readFileSync(join(REPO, "README.md"), "utf8").includes("Upload and deploy"), "and so does the README");
+});
+
 test("docs/feed.json is the seed, unexpired, and readable by the Worker", () => {
   assert.ok(feedIsCurrent(), "docs/feed.json lags the seed — run `npm run build`");
   const feed = __testing.readFeed(read("feed.json"), Date.now());
